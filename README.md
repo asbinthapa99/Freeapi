@@ -38,6 +38,8 @@ curl "https://your-app.vercel.app/api/v1/jobs/search?category=IT&location=Kathma
 
 Interactive API docs are available at `/docs`.
 
+![Swagger UI Preview 1](<Screenshot 2026-04-24 at 23.08.31.png>)
+
 ![Swagger UI Preview](<Screenshot 2026-04-24 at 23.09.28.png>)
 
 ---
