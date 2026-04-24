@@ -1,0 +1,67 @@
+services:
+  - type: web
+    name: nepal-api-ecosystem
+    runtime: node
+    plan: free
+    autoDeploy: true
+    rootDir: .
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "true"
+      - key: API_RATE_LIMIT_WINDOW_MS
+        value: "900000"
+      - key: API_RATE_LIMIT_MAX
+        value: "100"
+      - key: JWT_EXPIRES_IN
+        value: 15m
+      - key: REFRESH_TOKEN_TTL_DAYS
+        value: "30"
+      - key: MONGO_REQUIRED
+        value: "true"
+      - key: MONGO_SERVER_SELECTION_TIMEOUT_MS
+        value: "5000"
+      - key: ALLOW_PUBLIC_REGISTRATION
+        value: "false"
+      - key: PORT
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_NAME
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: MONGO_DB_NAME
+        sync: false
+      - key: OPENWEATHER_API_KEY
+        sync: false
+      - key: ALERT_WEBHOOK_URL
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: PERSONA_API_KEY
+        sync: false
+      - key: PERSONA_TEMPLATE_ID
+        sync: false
+      - key: KHALTI_API_BASE_URL
+        sync: false
+      - key: KHALTI_API_KEY
+        sync: false
+      - key: ESEWA_API_BASE_URL
+        sync: false
+      - key: ESEWA_API_KEY
+        sync: false
+      - key: CONNECT_IPS_API_BASE_URL
+        sync: false
+      - key: CONNECT_IPS_API_KEY
+        sync: false

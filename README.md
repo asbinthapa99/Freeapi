@@ -307,6 +307,36 @@ docker run -p 3000:3000 --env-file .env nepal-api
 
 ---
 
+## Render Deploy
+
+This backend is a better fit for Render than Vercel because it runs as a
+long-lived Express server and can keep normal Node process behavior.
+
+Recommended setup:
+
+1. Create a new `Web Service` on Render from this repository.
+2. Use the included [`render.yaml`](render.yaml) blueprint or set:
+   `Build Command: npm install`
+   `Start Command: npm start`
+3. Add required environment variables:
+   `JWT_SECRET`
+   `ADMIN_EMAIL`
+   `ADMIN_PASSWORD`
+   `MONGO_URI`
+   `MONGO_DB_NAME`
+   `CORS_ORIGIN`
+4. Use MongoDB Atlas for persistence.
+5. Point your Vercel frontend to the Render API URL, for example:
+   `NEXT_PUBLIC_API_URL=https://your-render-service.onrender.com`
+
+Production note:
+
+- Do not rely on local file persistence in production.
+- Set `MONGO_REQUIRED=true`.
+- Keep `ALLOW_PUBLIC_REGISTRATION=false` unless you explicitly want open signups.
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
