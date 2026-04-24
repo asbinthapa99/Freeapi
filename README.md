@@ -6,6 +6,24 @@
 
 ---
 
+## Current Release
+
+- Tag: `v1.2.0`
+- Target: `main`
+- Release commit: `02091d9`
+- Release URL: `https://github.com/asbinthapa99/Freeapi/releases/tag/v1.2.0`
+
+Release notes cover:
+- platform highlights
+- auth/RBAC
+- Swagger/OpenAPI
+- metrics/observability
+- CI/CD
+- validation
+- MIT license
+
+---
+
 ## Base URL
 
 ```
