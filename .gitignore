@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment
+.env
+
+# Logs
+logs/
+*.log
+
+# Coverage
+coverage/
+
+# Runtime storage
+.runtime-store/
+
+# AI/Project specific
+.claude/
+.qodo/
+.sixth/
+.runtime-store/
+PROJECT_FILE.md
+implementation_plan.md
+
+# OS junk
+.DS_Store
