@@ -20,7 +20,7 @@ Release notes cover:
 - metrics/observability
 - CI/CD
 - validation
-- MIT license
+- attribution-required license
 
 ---
 
@@ -323,4 +323,25 @@ docker run -p 3000:3000 --env-file .env nepal-api
 
 ## License
 
-MIT — free for personal and commercial use.
+This project is free to use, copy, modify, and deploy, but you must give
+credit to the original author.
+
+Required attribution:
+
+```text
+Original work by Asbin Thapa - Nepal API Ecosystem
+```
+
+Files:
+
+- `LICENSE`
+- `CODE_OF_CONDUCT.md`
+
+This repository is not MIT-licensed. It uses an attribution-required
+license included in the root `LICENSE` file.
+
+---
+
+## License
+
+Free to use with required attribution. See `LICENSE`.
