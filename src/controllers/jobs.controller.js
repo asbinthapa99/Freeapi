@@ -2,17 +2,20 @@
 const { v4: uuidv4 } = require('uuid');
 const jobsData = require('../data/jobsData');
 const { appendRecord, readCollection } = require('../services/persistence.service');
+const { getDataset } = require('../services/catalog.service');
 
 const getAllJobs = async () => {
+  const seededJobs = await getDataset('jobs_sample_jobs', jobsData.sampleJobs);
   const postedJobs = await readCollection('jobs');
-  return [...jobsData.sampleJobs, ...postedJobs];
+  return [...seededJobs, ...postedJobs];
 };
 
 exports.getCategories = async (req, res, next) => {
   try {
     const jobs = await getAllJobs();
     const dynamicCategories = jobs.map((job) => job.category).filter(Boolean);
-    const categories = [...new Set([...jobsData.jobCategories, ...dynamicCategories])];
+    const seededCategories = await getDataset('jobs_categories', jobsData.jobCategories);
+    const categories = [...new Set([...seededCategories, ...dynamicCategories])];
     res.json({ status: 'success', data: { count: categories.length, categories } });
   } catch (error) { next(error); }
 };
@@ -36,7 +39,8 @@ exports.parseResume = async (req, res, next) => {
     if (!resume_text) return res.status(400).json({ error: { code: 'MISSING_TEXT', message: 'Provide resume_text.', status: 400 } });
     
     const textLower = resume_text.toLowerCase();
-    const extractedSkills = jobsData.skillsDatabase.filter(skill => textLower.includes(skill.toLowerCase()));
+    const skillsDatabase = await getDataset('jobs_skills_database', jobsData.skillsDatabase);
+    const extractedSkills = skillsDatabase.filter(skill => textLower.includes(skill.toLowerCase()));
     
     let bestMatchCategory = 'General';
     if (extractedSkills.includes('nodejs') || extractedSkills.includes('react')) bestMatchCategory = 'IT';

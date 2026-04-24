@@ -7,6 +7,32 @@ const authLoginValidation = [
   body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long.')
 ];
 
+const authRegisterValidation = [
+  body('email').isEmail().withMessage('Valid email is required.'),
+  body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long.'),
+  body('full_name').isString().trim().notEmpty().withMessage('full_name is required.'),
+  body('roles').optional().isArray().withMessage('roles must be an array.'),
+  body('permissions').optional().isArray().withMessage('permissions must be an array.')
+];
+
+const authRefreshValidation = [
+  body('refresh_token').isString().trim().notEmpty().withMessage('refresh_token is required.')
+];
+
+const authUpdateUserValidation = [
+  param('user_id').isString().trim().notEmpty().withMessage('user_id is required.'),
+  body('email').optional().isEmail().withMessage('Valid email is required.'),
+  body('password').optional().isLength({ min: 8 }).withMessage('Password must be at least 8 characters long.'),
+  body('full_name').optional().isString().trim().notEmpty().withMessage('full_name must be a non-empty string.'),
+  body('roles').optional().isArray().withMessage('roles must be an array.'),
+  body('permissions').optional().isArray().withMessage('permissions must be an array.'),
+  body('status').optional().isIn(['ACTIVE', 'DISABLED']).withMessage('status must be ACTIVE or DISABLED.')
+];
+
+const authUserIdValidation = [
+  param('user_id').isString().trim().notEmpty().withMessage('user_id is required.')
+];
+
 const agriDiseaseValidation = [
   body('crop').isString().trim().notEmpty().withMessage('crop is required.'),
   body('symptoms').isArray({ min: 1 }).withMessage('symptoms must be a non-empty array.')
@@ -177,6 +203,10 @@ module.exports = {
   agriFertilizerValidation,
   agriWeatherValidation,
   authLoginValidation,
+  authRefreshValidation,
+  authRegisterValidation,
+  authUpdateUserValidation,
+  authUserIdValidation,
   disasterSubscriptionValidation,
   educationEssayValidation,
   educationObjectiveValidation,

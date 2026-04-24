@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nepal API Ecosystem — Free APIs for Nepal</title>
+  <meta name="description" content="10 production-ready free REST APIs built for Nepal. Agriculture, Tourism, Finance, Health, Transport and more." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+<div class="page-content">
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <span class="logo-icon">⛰</span>
+      <span class="logo-text">Nepal<span class="logo-accent">API</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="#apis">APIs</a>
+      <a href="#features">Features</a>
+      <a href="#examples">Docs</a>
+      <a href="/docs" target="_blank" class="nav-github">📄 Docs</a>
+      <a href="/health" target="_blank" class="nav-status">
+        <span class="status-dot"></span> Live
+      </a>
+    </div>
+    <div class="nav-cta">
+      <a href="/docs" target="_blank" class="btn btn-ghost">View Docs</a>
+      <a href="/api/v1/tourism/treks/routes" target="_blank" class="btn btn-primary">Try Free →</a>
+    </div>
+    <button class="nav-mobile-toggle" id="mobileToggle" aria-label="Menu">☰</button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#apis" onclick="closeMobile()">APIs</a>
+  <a href="#features" onclick="closeMobile()">Features</a>
+  <a href="#examples" onclick="closeMobile()">Docs</a>
+  <a href="/api/v1/tourism/treks/routes" target="_blank">Try Free →</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow hero-glow-1"></div>
+  <div class="hero-glow hero-glow-2"></div>
+
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      10 APIs · Completely Free · Production Ready
+    </div>
+
+    <h1 class="hero-title">
+      The open API platform<br />
+      <span class="hero-accent">built for Nepal</span>
+    </h1>
+
+    <p class="hero-sub">
+      Agriculture prices, trekking permits, health triage, transport booking,
+      job matching and more — all in one ecosystem. Free forever.
+    </p>
+
+    <div class="hero-actions">
+      <a href="#examples" class="btn btn-primary btn-lg">Start building →</a>
+      <a href="#apis" class="btn btn-ghost btn-lg">Explore APIs</a>
+    </div>
+
+    <!-- HERO CODE WINDOW -->
+    <div class="code-window">
+      <div class="code-window-bar">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-yellow"></span>
+        <span class="dot dot-green"></span>
+        <span class="code-window-title">Terminal</span>
+        <div class="tab-switcher">
+          <button class="tab active" data-target="snippet-curl">curl</button>
+          <button class="tab" data-target="snippet-js">JavaScript</button>
+          <button class="tab" data-target="snippet-python">Python</button>
+        </div>
+      </div>
+      <div class="code-body">
+        <pre id="snippet-curl" class="snippet active"><code><span class="c-comment"># Apply for a trekking permit</span>
+<span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> http://localhost:3000/api/v1/tourism/permits/apply \
+  <span class="c-flag">-H</span> <span class="c-str">"Content-Type: application/json"</span> \
+  <span class="c-flag">-d</span> <span class="c-str">'{"trek_id":"EBC","passport_number":"P123456","nationality":"Foreign"}'</span>
+
+<span class="c-comment"># Response</span>
+{
+  <span class="c-key">"status"</span>: <span class="c-str">"success"</span>,
+  <span class="c-key">"data"</span>: {
+    <span class="c-key">"permit_id"</span>: <span class="c-str">"PRMT-9FFE4A8F"</span>,
+    <span class="c-key">"trek"</span>: <span class="c-str">"Everest Base Camp"</span>,
+    <span class="c-key">"fee_npr"</span>: <span class="c-num">6000</span>,
+    <span class="c-key">"status"</span>: <span class="c-str">"PENDING_PAYMENT"</span>
+  }
+}</code></pre>
+
+        <pre id="snippet-js" class="snippet"><code><span class="c-comment">// Apply for a trekking permit</span>
+<span class="c-kw">const</span> response = <span class="c-kw">await</span> fetch(<span class="c-str">'http://localhost:3000/api/v1/tourism/permits/apply'</span>, {
+  method: <span class="c-str">'POST'</span>,
+  headers: { <span class="c-str">'Content-Type'</span>: <span class="c-str">'application/json'</span> },
+  body: JSON.stringify({
+    trek_id: <span class="c-str">'EBC'</span>,
+    passport_number: <span class="c-str">'P123456'</span>,
+    nationality: <span class="c-str">'Foreign'</span>
+  })
+});
+
+<span class="c-kw">const</span> { data } = <span class="c-kw">await</span> response.json();
+console.log(data.permit_id); <span class="c-comment">// PRMT-9FFE4A8F</span></code></pre>
+
+        <pre id="snippet-python" class="snippet"><code><span class="c-kw">import</span> requests
+
+<span class="c-comment"># Apply for a trekking permit</span>
+res = requests.post(
+    <span class="c-str">'http://localhost:3000/api/v1/tourism/permits/apply'</span>,
+    json={
+        <span class="c-str">'trek_id'</span>: <span class="c-str">'EBC'</span>,
+        <span class="c-str">'passport_number'</span>: <span class="c-str">'P123456'</span>,
+        <span class="c-str">'nationality'</span>: <span class="c-str">'Foreign'</span>
+    }
+)
+data = res.json()[<span class="c-str">'data'</span>]
+<span class="c-kw">print</span>(data[<span class="c-str">'permit_id'</span>])  <span class="c-comment"># PRMT-9FFE4A8F</span></code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat">
+      <span class="stat-num">10</span>
+      <span class="stat-label">APIs</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat-num">40+</span>
+      <span class="stat-label">Endpoints</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat-num">Free</span>
+      <span class="stat-label">Forever</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat-num">MongoDB</span>
+      <span class="stat-label">Atlas Backed</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat-num">JWT</span>
+      <span class="stat-label">Auth Protected</span>
+    </div>
+  </div>
+</div>
+
+<!-- API CARDS -->
+<section class="section" id="apis">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <p class="section-label">All APIs</p>
+      <h2 class="section-title">Everything Nepal needs,<br />one base URL</h2>
+      <p class="section-sub">Each API is independently usable. Click any endpoint to copy the full URL. GET endpoints open directly in browser.</p>
+    </div>
+
+    <div class="api-grid">
+
+      <!-- Auth -->
+      <div class="api-card reveal reveal-delay-1">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.2)">
+            <span>🔐</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">Auth</h3>
+            <span class="api-category">Authentication</span>
+          </div>
+          <span class="api-badge badge-protected">Protected</span>
+        </div>
+        <p class="api-desc">JWT-based admin authentication. Login to get a Bearer token for protected write endpoints.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="POST" data-path="/api/v1/auth/login">
+            <span class="ep-method m-post">POST</span>
+            <code class="ep-path">/auth/login</code>
+            <div class="ep-actions">
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/auth</code>
+          <span class="endpoint-count">1 endpoint</span>
+        </div>
+      </div>
+
+      <!-- Language -->
+      <div class="api-card reveal reveal-delay-3">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.2)">
+            <span>🗣️</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">BhasaAI</h3>
+            <span class="api-category">Language</span>
+          </div>
+          <span class="api-badge badge-free">Free</span>
+        </div>
+        <p class="api-desc">Nepali language translation, transliteration, sentiment analysis, NER, and language detection.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="POST" data-path="/api/v1/language/translate">
+            <span class="ep-method m-post">POST</span><code class="ep-path">/language/translate</code>
+            <div class="ep-actions"><button class="ep-copy" title="Copy URL">⎘</button></div>
+          </div>
+          <div class="ep-row" data-method="POST" data-path="/api/v1/language/sentiment">
+            <span class="ep-method m-post">POST</span><code class="ep-path">/language/sentiment</code>
+            <div class="ep-actions"><button class="ep-copy" title="Copy URL">⎘</button></div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/language/detect">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/language/detect</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/language/detect?text=Namaste" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/language</code>
+          <span class="endpoint-count">5 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Agriculture -->
+      <div class="api-card reveal reveal-delay-6">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.2)">
+            <span>🌾</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">KrishiData</h3>
+            <span class="api-category">Agriculture</span>
+          </div>
+          <span class="api-badge badge-free">Free</span>
+        </div>
+        <p class="api-desc">Live Kalimati market prices, crop disease analysis, weather forecasts, and fertilizer recommendations.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/agri/prices/kalimati">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/agri/prices/kalimati</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/agri/prices/kalimati" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="POST" data-path="/api/v1/agri/disease/analyze">
+            <span class="ep-method m-post">POST</span><code class="ep-path">/agri/disease/analyze</code>
+            <div class="ep-actions"><button class="ep-copy" title="Copy URL">⎘</button></div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/agri/crops/calendar">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/agri/crops/calendar</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/agri/crops/calendar" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/agri</code>
+          <span class="endpoint-count">5 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Disaster -->
+      <div class="api-card reveal reveal-delay-3">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(249,115,22,0.1);border-color:rgba(249,115,22,0.2)">
+            <span>🚨</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">NepalAlert</h3>
+            <span class="api-category">Disaster</span>
+          </div>
+          <span class="api-badge badge-alert">Alert</span>
+        </div>
+        <p class="api-desc">Active disaster alerts, river flood levels, landslide risk zones, earthquake data, and SMS subscriptions.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/disaster/alerts/active">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/disaster/alerts/active</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/disaster/alerts/active" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/disaster/rivers/levels">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/disaster/rivers/levels</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/disaster/rivers/levels" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/disaster/earthquakes/recent">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/disaster/earthquakes/recent</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/disaster/earthquakes/recent" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/disaster</code>
+          <span class="endpoint-count">5 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Tourism — featured -->
+      <div class="api-card card-featured reveal reveal-delay-6">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(220,38,38,0.12);border-color:rgba(220,38,38,0.25)">
+            <span>🏔️</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">YatraTech</h3>
+            <span class="api-category">Tourism</span>
+          </div>
+          <span class="api-badge badge-free">Free</span>
+        </div>
+        <p class="api-desc">Trekking routes, permit applications (MongoDB Atlas), itinerary generation, teahouse availability, and altitude risk.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/tourism/treks/routes">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/tourism/treks/routes</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/tourism/treks/routes" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="POST" data-path="/api/v1/tourism/permits/apply">
+            <span class="ep-method m-post">POST</span><code class="ep-path">/tourism/permits/apply</code>
+            <div class="ep-actions"><button class="ep-copy" title="Copy URL">⎘</button></div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/tourism/teahouses/availability">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/tourism/teahouses/availability</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/tourism/teahouses/availability" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/tourism</code>
+          <span class="endpoint-count">6 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Finance -->
+      <div class="api-card reveal reveal-delay-3">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(234,179,8,0.1);border-color:rgba(234,179,8,0.2)">
+            <span>💰</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">PaisaLink</h3>
+            <span class="api-category">Finance</span>
+          </div>
+          <span class="api-badge badge-free">Free</span>
+        </div>
+        <p class="api-desc">Live NRB forex rates, remittance calculator, eSewa/Khalti payment initiation, bank branches, and budget categorizer.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/finance/forex/rates">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/finance/forex/rates</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/finance/forex/rates" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="POST" data-path="/api/v1/finance/remittance/calculate">
+            <span class="ep-method m-post">POST</span><code class="ep-path">/finance/remittance/calculate</code>
+            <div class="ep-actions"><button class="ep-copy" title="Copy URL">⎘</button></div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/finance/banks/branches">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/finance/banks/branches</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/finance/banks/branches" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/finance</code>
+          <span class="endpoint-count">7 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Education -->
+      <div class="api-card reveal reveal-delay-6">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.2)">
+            <span>📚</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">Shikshya</h3>
+            <span class="api-category">Education</span>
+          </div>
+          <span class="api-badge badge-free">Free</span>
+        </div>
+        <p class="api-desc">AI tutor, syllabus by grade, past exam papers, objective and essay grading for Nepal's curriculum.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="POST" data-path="/api/v1/education/tutor/ask">
+            <span class="ep-method m-post">POST</span><code class="ep-path">/education/tutor/ask</code>
+            <div class="ep-actions"><button class="ep-copy" title="Copy URL">⎘</button></div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/education/syllabus/10">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/education/syllabus/:grade</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/education/syllabus/10" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/education/past-papers">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/education/past-papers</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/education/past-papers" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/education</code>
+          <span class="endpoint-count">7 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Health -->
+      <div class="api-card reveal reveal-delay-3">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(236,72,153,0.1);border-color:rgba(236,72,153,0.2)">
+            <span>🏥</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">SwasthyaTriage</h3>
+            <span class="api-category">Health</span>
+          </div>
+          <span class="api-badge badge-free">Free</span>
+        </div>
+        <p class="api-desc">Symptom-based triage, nearby health facility finder, first-aid guides, and disease outbreak monitoring.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="POST" data-path="/api/v1/health/triage/analyze">
+            <span class="ep-method m-post">POST</span><code class="ep-path">/health/triage/analyze</code>
+            <div class="ep-actions"><button class="ep-copy" title="Copy URL">⎘</button></div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/health/facilities/nearby">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/health/facilities/nearby</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/health/facilities/nearby" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/health/diseases/outbreaks">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/health/diseases/outbreaks</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/health/diseases/outbreaks" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/health</code>
+          <span class="endpoint-count">5 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Government -->
+      <div class="api-card reveal reveal-delay-6">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(20,184,166,0.1);border-color:rgba(20,184,166,0.2)">
+            <span>🏛️</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">NagarikConnect</h3>
+            <span class="api-category">Government</span>
+          </div>
+          <span class="api-badge badge-free">Free</span>
+        </div>
+        <p class="api-desc">Application status tracking, document verification, public holidays, ward office locator, and vehicle tax rates.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/gov/holidays">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/gov/holidays</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/gov/holidays" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/gov/tax/vehicle-rates">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/gov/tax/vehicle-rates</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/gov/tax/vehicle-rates" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="POST" data-path="/api/v1/gov/documents/verify">
+            <span class="ep-method m-post">POST</span><code class="ep-path">/gov/documents/verify</code>
+            <div class="ep-actions"><button class="ep-copy" title="Copy URL">⎘</button></div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/gov</code>
+          <span class="endpoint-count">6 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Jobs -->
+      <div class="api-card reveal reveal-delay-3">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.2)">
+            <span>💼</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">RozgariMatch</h3>
+            <span class="api-category">Jobs</span>
+          </div>
+          <span class="api-badge badge-free">Free</span>
+        </div>
+        <p class="api-desc">Job search by category and location, resume skill extraction, candidate–job matching, and foreign demand verification.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/jobs/search">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/jobs/search</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/jobs/search" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="POST" data-path="/api/v1/jobs/resume/parse">
+            <span class="ep-method m-post">POST</span><code class="ep-path">/jobs/resume/parse</code>
+            <div class="ep-actions"><button class="ep-copy" title="Copy URL">⎘</button></div>
+          </div>
+          <div class="ep-row" data-method="POST" data-path="/api/v1/jobs/match">
+            <span class="ep-method m-post">POST</span><code class="ep-path">/jobs/match</code>
+            <div class="ep-actions"><button class="ep-copy" title="Copy URL">⎘</button></div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/jobs</code>
+          <span class="endpoint-count">6 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Transport -->
+      <div class="api-card reveal reveal-delay-6">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(6,182,212,0.1);border-color:rgba(6,182,212,0.2)">
+            <span>🚌</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">YataYat</h3>
+            <span class="api-category">Transport</span>
+          </div>
+          <span class="api-badge badge-free">Free</span>
+        </div>
+        <p class="api-desc">City and intercity bus routes, fare calculator with student discounts, seat availability, and ticket booking.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/transport/routes/search">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/transport/routes/search</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/transport/routes/search" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/transport/routes/intercity">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/transport/routes/intercity</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/transport/routes/intercity" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="POST" data-path="/api/v1/transport/tickets/book">
+            <span class="ep-method m-post">POST</span><code class="ep-path">/transport/tickets/book</code>
+            <div class="ep-actions"><button class="ep-copy" title="Copy URL">⎘</button></div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/transport</code>
+          <span class="endpoint-count">7 endpoints</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section section-dark" id="features">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <p class="section-label">Why Nepal API</p>
+      <h2 class="section-title">Built for real-world use</h2>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">⚡</div>
+        <h3>JWT Authentication</h3>
+        <p>Admin-protected write endpoints secured with JSON Web Tokens. Public read endpoints need no key.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon">🗄️</div>
+        <h3>MongoDB Atlas Backed</h3>
+        <p>Permits, tickets, jobs, payments, and subscriptions persist in MongoDB Atlas with file fallback for local dev.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feature-icon">🛡️</div>
+        <h3>Validated &amp; Rate Limited</h3>
+        <p>Every endpoint validated with express-validator. 100 req/15 min rate limiting. Helmet security headers.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-4">
+        <div class="feature-icon">📦</div>
+        <h3>Docker Ready</h3>
+        <p>Comes with a production Dockerfile. Drop in your env file and ship.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-5">
+        <div class="feature-icon">🔄</div>
+        <h3>Live API Fallbacks</h3>
+        <p>External integrations (NRB forex, OpenWeatherMap) gracefully fall back to realistic cached data if unavailable.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-6">
+        <div class="feature-icon">📋</div>
+        <h3>Structured Logging</h3>
+        <p>Winston JSON logs + Morgan HTTP access logs. Production-mode uses combined Apache format.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CODE EXAMPLES -->
+<section class="section" id="examples">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <p class="section-label">Quick Start</p>
+      <h2 class="section-title">Up in 30 seconds</h2>
+    </div>
+
+    <div class="examples-layout">
+      <div class="example-nav">
+        <button class="example-tab active" data-example="health">Health Check</button>
+        <button class="example-tab" data-example="auth">Get Auth Token</button>
+        <button class="example-tab" data-example="forex">Forex Rates</button>
+        <button class="example-tab" data-example="permit">Apply Permit</button>
+        <button class="example-tab" data-example="jobs">Search Jobs</button>
+        <button class="example-tab" data-example="triage">Health Triage</button>
+        <button class="example-tab" data-example="transport">Book Ticket</button>
+      </div>
+
+      <div class="example-panel">
+        <div id="example-health" class="example-content active">
+          <div class="example-meta">
+            <span class="method get">GET</span>
+            <code>/health</code>
+          </div>
+          <pre class="code-block"><code><span class="c-cmd">curl</span> http://localhost:3000/health
+
+<span class="c-comment"># 200 OK</span>
+{
+  <span class="c-key">"status"</span>: <span class="c-str">"success"</span>,
+  <span class="c-key">"message"</span>: <span class="c-str">"Nepal API Ecosystem is healthy"</span>,
+  <span class="c-key">"mongodb"</span>: <span class="c-str">"connected"</span>,
+  <span class="c-key">"uptime_seconds"</span>: <span class="c-num">42</span>
+}</code></pre>
+          <div class="live-runner" data-url="/health">
+            <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
+            <pre class="live-response" hidden></pre>
+          </div>
+        </div>
+
+        <div id="example-auth" class="example-content">
+          <div class="example-meta">
+            <span class="method post">POST</span>
+            <code>/api/v1/auth/login</code>
+          </div>
+          <pre class="code-block"><code><span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> http://localhost:3000/api/v1/auth/login \
+  <span class="c-flag">-H</span> <span class="c-str">"Content-Type: application/json"</span> \
+  <span class="c-flag">-d</span> <span class="c-str">'{"email":"admin@nepalapi.dev","password":"NepalApi@2024!"}'</span>
+
+<span class="c-comment"># 200 OK</span>
+{
+  <span class="c-key">"status"</span>: <span class="c-str">"success"</span>,
+  <span class="c-key">"data"</span>: {
+    <span class="c-key">"token"</span>: <span class="c-str">"eyJhbGciOiJIUzI1NiIs..."</span>,
+    <span class="c-key">"token_type"</span>: <span class="c-str">"Bearer"</span>,
+    <span class="c-key">"expires_in"</span>: <span class="c-str">"7d"</span>
+  }
+}</code></pre>
+        </div>
+
+        <div id="example-forex" class="example-content">
+          <div class="example-meta">
+            <span class="method get">GET</span>
+            <code>/api/v1/finance/forex/rates</code>
+          </div>
+          <pre class="code-block"><code><span class="c-cmd">curl</span> http://localhost:3000/api/v1/finance/forex/rates
+
+<span class="c-comment"># 200 OK — live from Nepal Rastra Bank</span>
+{
+  <span class="c-key">"status"</span>: <span class="c-str">"success"</span>,
+  <span class="c-key">"source"</span>: <span class="c-str">"NRB Live API"</span>,
+  <span class="c-key">"data"</span>: {
+    <span class="c-key">"rates"</span>: [
+      { <span class="c-key">"iso3"</span>: <span class="c-str">"USD"</span>, <span class="c-key">"buy"</span>: <span class="c-num">133.50</span>, <span class="c-key">"sell"</span>: <span class="c-num">134.10</span> },
+      { <span class="c-key">"iso3"</span>: <span class="c-str">"EUR"</span>, <span class="c-key">"buy"</span>: <span class="c-num">145.20</span>, <span class="c-key">"sell"</span>: <span class="c-num">145.85</span> }
+    ]
+  }
+}</code></pre>
+          <div class="live-runner" data-url="/api/v1/finance/forex/rates">
+            <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
+            <pre class="live-response" hidden></pre>
+          </div>
+        </div>
+
+        <div id="example-permit" class="example-content">
+          <div class="example-meta">
+            <span class="method post">POST</span>
+            <code>/api/v1/tourism/permits/apply</code>
+          </div>
+          <pre class="code-block"><code><span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> http://localhost:3000/api/v1/tourism/permits/apply \
+  <span class="c-flag">-H</span> <span class="c-str">"Content-Type: application/json"</span> \
+  <span class="c-flag">-d</span> <span class="c-str">'{"trek_id":"EBC","passport_number":"P123456","nationality":"Foreign"}'</span>
+
+<span class="c-comment"># 201 Created — persisted in MongoDB Atlas</span>
+{
+  <span class="c-key">"status"</span>: <span class="c-str">"success"</span>,
+  <span class="c-key">"data"</span>: {
+    <span class="c-key">"permit_id"</span>: <span class="c-str">"PRMT-9FFE4A8F"</span>,
+    <span class="c-key">"trek"</span>: <span class="c-str">"Everest Base Camp"</span>,
+    <span class="c-key">"fee_npr"</span>: <span class="c-num">6000</span>,
+    <span class="c-key">"status"</span>: <span class="c-str">"PENDING_PAYMENT"</span>
+  }
+}</code></pre>
+        </div>
+
+        <div id="example-jobs" class="example-content">
+          <div class="example-meta">
+            <span class="method get">GET</span>
+            <code>/api/v1/jobs/search?category=IT&location=Kathmandu</code>
+          </div>
+          <pre class="code-block"><code><span class="c-cmd">curl</span> <span class="c-str">"http://localhost:3000/api/v1/jobs/search?category=IT&location=Kathmandu"</span>
+
+<span class="c-comment"># 200 OK</span>
+{
+  <span class="c-key">"status"</span>: <span class="c-str">"success"</span>,
+  <span class="c-key">"data"</span>: {
+    <span class="c-key">"count"</span>: <span class="c-num">3</span>,
+    <span class="c-key">"jobs"</span>: [
+      {
+        <span class="c-key">"title"</span>: <span class="c-str">"Backend Engineer"</span>,
+        <span class="c-key">"company"</span>: <span class="c-str">"Kathmandu Tech"</span>,
+        <span class="c-key">"type"</span>: <span class="c-str">"FULL_TIME"</span>
+      }
+    ]
+  }
+}</code></pre>
+          <div class="live-runner" data-url="/api/v1/jobs/search?category=IT&amp;location=Kathmandu">
+            <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
+            <pre class="live-response" hidden></pre>
+          </div>
+        </div>
+
+        <div id="example-triage" class="example-content">
+          <div class="example-meta">
+            <span class="method post">POST</span>
+            <code>/api/v1/health/triage/analyze</code>
+          </div>
+          <pre class="code-block"><code><span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> http://localhost:3000/api/v1/health/triage/analyze \
+  <span class="c-flag">-H</span> <span class="c-str">"Content-Type: application/json"</span> \
+  <span class="c-flag">-d</span> <span class="c-str">'{"symptoms":["high_fever","joint_pain","rash"],"patient_age":28}'</span>
+
+<span class="c-comment"># 200 OK</span>
+{
+  <span class="c-key">"data"</span>: {
+    <span class="c-key">"urgency"</span>: <span class="c-str">"HIGH"</span>,
+    <span class="c-key">"recommendation"</span>: <span class="c-str">"Visit a hospital immediately."</span>,
+    <span class="c-key">"possible_conditions"</span>: [{ <span class="c-key">"name"</span>: <span class="c-str">"Dengue Fever"</span> }]
+  }
+}</code></pre>
+        </div>
+
+        <div id="example-transport" class="example-content">
+          <div class="example-meta">
+            <span class="method post">POST</span>
+            <code>/api/v1/transport/tickets/book</code>
+          </div>
+          <pre class="code-block"><code><span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> http://localhost:3000/api/v1/transport/tickets/book \
+  <span class="c-flag">-H</span> <span class="c-str">"Content-Type: application/json"</span> \
+  <span class="c-flag">-d</span> <span class="c-str">'{"route_id":"IC1","passenger_name":"Ram Bahadur","date":"2026-05-01"}'</span>
+
+<span class="c-comment"># 201 Created</span>
+{
+  <span class="c-key">"data"</span>: {
+    <span class="c-key">"ticket_id"</span>: <span class="c-str">"TKT-C5676549"</span>,
+    <span class="c-key">"passenger_name"</span>: <span class="c-str">"Ram Bahadur"</span>,
+    <span class="c-key">"status"</span>: <span class="c-str">"CONFIRMED"</span>
+  }
+}</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <div class="cta-glow"></div>
+    <p class="section-label">Start Today</p>
+    <h2>Build something for Nepal</h2>
+    <p class="cta-sub">10 production-ready APIs, zero signup, no credit card. Hit an endpoint and you're live in seconds.</p>
+    <div class="cta-actions">
+      <a href="/docs" target="_blank" class="btn btn-primary btn-lg">Read the Docs →</a>
+      <a href="/api/v1/tourism/treks/routes" target="_blank" class="btn btn-ghost btn-lg">Try Live API ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- BASE URL BANNER -->
+<section class="base-url-banner">
+  <div class="section-inner">
+    <p class="base-label">Base URL</p>
+    <div class="base-url-box">
+      <code id="base-url-text">http://localhost:3000/api/v1</code>
+      <button class="copy-btn" onclick="copyBaseUrl()">
+        <span id="copy-icon">⎘</span> Copy
+      </button>
+    </div>
+    <p class="base-hint">All endpoints are prefixed with this URL. No API key required for public endpoints.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="nav-logo">
+        <span class="logo-icon">⛰</span>
+        <span class="logo-text">Nepal<span class="logo-accent">API</span></span>
+      </a>
+      <p>Free, open REST APIs built for the Nepali digital ecosystem.</p>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>APIs</h4>
+        <a href="#apis">All APIs</a>
+        <a href="/health" target="_blank">Health Status</a>
+        <a href="#examples">Quick Start</a>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <a href="/api/v1/tourism/treks/routes" target="_blank">Trek Routes</a>
+        <a href="/api/v1/finance/forex/rates" target="_blank">Forex Rates</a>
+        <a href="/api/v1/gov/holidays" target="_blank">Public Holidays</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>MIT License · Nepal API Ecosystem · Built with Node.js + MongoDB Atlas</p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</div><!-- /page-content -->
+</body>
+</html>

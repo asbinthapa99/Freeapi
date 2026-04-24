@@ -2,11 +2,12 @@
 const { v4: uuidv4 } = require('uuid');
 const transportData = require('../data/transportData');
 const { appendRecord } = require('../services/persistence.service');
+const { getDataset } = require('../services/catalog.service');
 
 exports.getRoutes = async (req, res, next) => {
   try {
     const { start, end } = req.query;
-    let routes = transportData.routes;
+    let routes = await getDataset('transport_routes', transportData.routes);
     
     if (start) routes = routes.filter(r => r.stops.some(s => s.toLowerCase() === start.toLowerCase()));
     if (end) routes = routes.filter(r => r.stops.some(s => s.toLowerCase() === end.toLowerCase()));
@@ -30,9 +31,10 @@ exports.calculateFare = async (req, res, next) => {
       return res.status(400).json({ error: { code: 'MISSING_PARAMS', message: 'Provide distance_km and vehicle_type.', status: 400 } });
     }
     
-    const rule = transportData.fareRules[vehicle_type.toUpperCase()];
+    const fareRules = await getDataset('transport_fare_rules', transportData.fareRules);
+    const rule = fareRules[vehicle_type.toUpperCase()];
     if (!rule) {
-      return res.status(400).json({ error: { code: 'INVALID_VEHICLE', message: `Invalid vehicle_type. Allowed: ${Object.keys(transportData.fareRules).join(', ')}`, status: 400 } });
+      return res.status(400).json({ error: { code: 'INVALID_VEHICLE', message: `Invalid vehicle_type. Allowed: ${Object.keys(fareRules).join(', ')}`, status: 400 } });
     }
     
     let fare = rule.base_fare + (Math.max(0, distance_km - 4) * rule.per_km); // base covers first 4km
@@ -45,7 +47,7 @@ exports.calculateFare = async (req, res, next) => {
 exports.getIntercityRoutes = async (req, res, next) => {
   try {
     const { from, to } = req.query;
-    let routes = transportData.intercityRoutes;
+    let routes = await getDataset('transport_intercity_routes', transportData.intercityRoutes);
     if (from) routes = routes.filter(r => r.from.toLowerCase() === from.toLowerCase());
     if (to) routes = routes.filter(r => r.to.toLowerCase() === to.toLowerCase());
     
@@ -59,7 +61,8 @@ exports.bookTicket = async (req, res, next) => {
     if (!route_id || !passenger_name || !date) {
       return res.status(400).json({ error: { code: 'MISSING_PARAMS', message: 'Provide route_id, passenger_name, and date.', status: 400 } });
     }
-    const route = transportData.intercityRoutes.find(r => r.id === route_id);
+    const intercityRoutes = await getDataset('transport_intercity_routes', transportData.intercityRoutes);
+    const route = intercityRoutes.find(r => r.id === route_id);
     if (!route) return res.status(404).json({ error: { code: 'ROUTE_NOT_FOUND', message: `Intercity Route ID ${route_id} not found.`, status: 404 } });
     
     const ticket = {
@@ -81,7 +84,8 @@ exports.searchRoutes = exports.getRoutes;
 exports.getBusLocation = async (req, res, next) => {
   try {
     const { bus_id } = req.params;
-    const route = transportData.routes.find((item) => item.id === bus_id.toUpperCase());
+    const routes = await getDataset('transport_routes', transportData.routes);
+    const route = routes.find((item) => item.id === bus_id.toUpperCase());
     if (!route) {
       return res.status(404).json({ error: { code: 'BUS_NOT_FOUND', message: `Bus or route ${bus_id} not found.`, status: 404 } });
     }
@@ -103,7 +107,8 @@ exports.getBusLocation = async (req, res, next) => {
 exports.getSeats = async (req, res, next) => {
   try {
     const { trip_id } = req.params;
-    const route = transportData.intercityRoutes.find((item) => item.id === trip_id.toUpperCase());
+    const intercityRoutes = await getDataset('transport_intercity_routes', transportData.intercityRoutes);
+    const route = intercityRoutes.find((item) => item.id === trip_id.toUpperCase());
     if (!route) {
       return res.status(404).json({ error: { code: 'TRIP_NOT_FOUND', message: `Trip ID ${trip_id} not found.`, status: 404 } });
     }

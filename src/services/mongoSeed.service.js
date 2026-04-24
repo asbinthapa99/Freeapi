@@ -1,6 +1,12 @@
 const jobsData = require('../data/jobsData');
 const tourismData = require('../data/tourismData');
 const transportData = require('../data/transportData');
+const healthData = require('../data/healthData');
+const educationData = require('../data/educationData');
+const languageData = require('../data/languageData');
+const govDisasterData = require('../data/govDisasterData');
+const holidays = require('../data/holidays');
+const kalimatiPrices = require('../data/kalimatiPrices');
 const logger = require('./logger.service');
 const { getMongoDb, isMongoConnected } = require('./db.service');
 
@@ -41,7 +47,7 @@ const seedMongoDatabase = async () => {
 
   const db = getMongoDb();
   const metadataCollection = db.collection('seed_metadata');
-  const existingSeed = await metadataCollection.findOne({ key: 'initial_seed_v1' });
+  const existingSeed = await metadataCollection.findOne({ key: 'initial_seed_v2' });
 
   if (existingSeed) {
     logger.info({
@@ -52,7 +58,11 @@ const seedMongoDatabase = async () => {
   }
 
   const insertedJobs = await upsertManyByField('jobs_catalog', jobsData.sampleJobs, 'id');
-  const insertedCategories = await upsertManyByField('job_categories', jobsData.jobCategories, 'id');
+  const categories = jobsData.jobCategories.map((category, index) => ({
+    id: `CATEGORY-${index + 1}`,
+    name: category
+  }));
+  const insertedCategories = await upsertManyByField('job_categories', categories, 'id');
   const insertedTreks = await upsertManyByField('tourism_treks', tourismData.treks, 'id');
   const teahouses = tourismData.teahouses.map((teahouse, index) => ({
     teahouse_id: `TEAHOUSE-${index + 1}`,
@@ -61,12 +71,48 @@ const seedMongoDatabase = async () => {
   const insertedTeahouses = await upsertManyByField('tourism_teahouses', teahouses, 'teahouse_id');
   const insertedRoutes = await upsertManyByField('transport_routes_catalog', transportData.routes, 'id');
   const insertedIntercityRoutes = await upsertManyByField('transport_intercity_routes', transportData.intercityRoutes, 'id');
+  const catalogDatasets = [
+    { dataset_key: 'agri_kalimati_prices', payload: kalimatiPrices },
+    { dataset_key: 'disaster_active_alerts', payload: govDisasterData.activeAlerts },
+    { dataset_key: 'disaster_river_stations', payload: govDisasterData.riverStations },
+    { dataset_key: 'disaster_landslide_zones', payload: govDisasterData.landslideZones },
+    { dataset_key: 'education_subjects', payload: educationData.subjects },
+    { dataset_key: 'education_past_papers', payload: educationData.pastPapers },
+    { dataset_key: 'education_qa_bank', payload: educationData.qaBank },
+    { dataset_key: 'finance_bank_branches', payload: [
+      { bank: 'Nabil Bank', district: 'Kathmandu', branch: 'Putalisadak', phone: '01-4422334' },
+      { bank: 'Global IME Bank', district: 'Pokhara', branch: 'Lakeside', phone: '061-451122' },
+      { bank: 'NIC Asia', district: 'Chitwan', branch: 'Bharatpur', phone: '056-590221' },
+      { bank: 'Kumari Bank', district: 'Biratnagar', branch: 'Main Road', phone: '021-536200' }
+    ] },
+    { dataset_key: 'gov_applications', payload: govDisasterData.govApplications },
+    { dataset_key: 'gov_ward_offices', payload: govDisasterData.wardOffices },
+    { dataset_key: 'gov_holidays', payload: holidays },
+    { dataset_key: 'health_symptom_map', payload: healthData.symptomMap },
+    { dataset_key: 'health_facilities', payload: healthData.healthFacilities },
+    { dataset_key: 'health_first_aid', payload: healthData.firstAid },
+    { dataset_key: 'jobs_sample_jobs', payload: jobsData.sampleJobs },
+    { dataset_key: 'jobs_categories', payload: jobsData.jobCategories },
+    { dataset_key: 'jobs_skills_database', payload: jobsData.skillsDatabase },
+    { dataset_key: 'language_translations', payload: languageData.translations },
+    { dataset_key: 'language_transliteration_map', payload: languageData.transliterationMap },
+    { dataset_key: 'language_positive_words', payload: languageData.positiveWords },
+    { dataset_key: 'language_negative_words', payload: languageData.negativeWords },
+    { dataset_key: 'language_nepali_entities', payload: languageData.nepaliEntities },
+    { dataset_key: 'tourism_treks', payload: tourismData.treks },
+    { dataset_key: 'tourism_teahouses', payload: tourismData.teahouses },
+    { dataset_key: 'tourism_altitude_risk', payload: tourismData.altitudeRiskTable },
+    { dataset_key: 'transport_routes', payload: transportData.routes },
+    { dataset_key: 'transport_intercity_routes', payload: transportData.intercityRoutes },
+    { dataset_key: 'transport_fare_rules', payload: transportData.fareRules }
+  ];
+  const insertedCatalogDatasets = await upsertManyByField('catalog_datasets', catalogDatasets, 'dataset_key');
 
   await metadataCollection.updateOne(
-    { key: 'initial_seed_v1' },
+    { key: 'initial_seed_v2' },
     {
       $setOnInsert: {
-        key: 'initial_seed_v1',
+        key: 'initial_seed_v2',
         created_at: new Date().toISOString(),
         collections_seeded: [
           'jobs_catalog',
@@ -74,7 +120,8 @@ const seedMongoDatabase = async () => {
           'tourism_treks',
           'tourism_teahouses',
           'transport_routes_catalog',
-          'transport_intercity_routes'
+          'transport_intercity_routes',
+          'catalog_datasets'
         ]
       }
     },
@@ -90,7 +137,8 @@ const seedMongoDatabase = async () => {
       tourism_treks: insertedTreks,
       tourism_teahouses: insertedTeahouses,
       transport_routes_catalog: insertedRoutes,
-      transport_intercity_routes: insertedIntercityRoutes
+      transport_intercity_routes: insertedIntercityRoutes,
+      catalog_datasets: insertedCatalogDatasets
     }
   });
 

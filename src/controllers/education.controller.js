@@ -1,10 +1,12 @@
 // Shikshya AI API Controller - Education
 const educationData = require('../data/educationData');
+const { getDataset } = require('../services/catalog.service');
 
 exports.getSyllabus = async (req, res, next) => {
   try {
     const { grade } = req.params;
-    const subjects = educationData.subjects[grade.toUpperCase()];
+    const subjectsData = await getDataset('education_subjects', educationData.subjects);
+    const subjects = subjectsData[grade.toUpperCase()];
     if (!subjects) {
       return res.status(404).json({ error: { code: 'GRADE_NOT_FOUND', message: `Grade ${grade} not found. Available: ${Object.keys(educationData.subjects).join(', ')}`, status: 404 } });
     }
@@ -17,7 +19,7 @@ exports.getPastPapers = async (req, res, next) => {
     const subject = req.params.subject || req.query.subject;
     const year = req.params.year ? Number(req.params.year) : undefined;
     const { grade } = req.query;
-    let papers = educationData.pastPapers;
+    let papers = await getDataset('education_past_papers', educationData.pastPapers);
     if (subject) papers = papers.filter(p => p.subject.toLowerCase() === subject.toLowerCase());
     if (grade) papers = papers.filter(p => p.grade.toLowerCase() === grade.toLowerCase());
     if (year) papers = papers.filter(p => p.year === year);
@@ -32,9 +34,10 @@ exports.askTutor = async (req, res, next) => {
     
     const qLower = question.toLowerCase();
     let bestMatch = null;
+    const qaBank = await getDataset('education_qa_bank', educationData.qaBank);
     
     // Simple keyword matching for Q&A bank
-    for (const [key, qa] of Object.entries(educationData.qaBank)) {
+    for (const [key, qa] of Object.entries(qaBank)) {
       if (qLower.includes(key) && (!grade_level || qa.grade === grade_level.toUpperCase())) {
         bestMatch = qa;
         break;

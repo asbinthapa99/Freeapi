@@ -1,10 +1,14 @@
 // NagarikConnect API Controller - Government Services
 const govDisasterData = require('../data/govDisasterData');
+const holidaysFallback = require('../data/holidays');
+const { getDataset } = require('../services/catalog.service');
+const verificationService = require('../services/verification.service');
 
 exports.trackApplication = async (req, res, next) => {
   try {
     const { app_id } = req.params;
-    const application = govDisasterData.govApplications[app_id.toUpperCase()];
+    const applications = await getDataset('gov_applications', govDisasterData.govApplications);
+    const application = applications[app_id.toUpperCase()];
     
     if (!application) {
       return res.status(404).json({ error: { code: 'APP_NOT_FOUND', message: `Application ID ${app_id} not found.`, status: 404 } });
@@ -17,7 +21,7 @@ exports.trackApplication = async (req, res, next) => {
 exports.getWardInfo = async (req, res, next) => {
   try {
     const { ward, municipality } = req.query;
-    let offices = govDisasterData.wardOffices;
+    let offices = await getDataset('gov_ward_offices', govDisasterData.wardOffices);
     
     if (ward) offices = offices.filter(o => o.ward === parseInt(ward, 10));
     if (municipality) offices = offices.filter(o => o.municipality.toLowerCase().includes(municipality.toLowerCase()));
@@ -28,9 +32,8 @@ exports.getWardInfo = async (req, res, next) => {
 
 exports.getPublicHolidays = async (req, res, next) => {
   try {
-    const holidaysData = require('../data/holidays');
     const { year, month } = req.query;
-    let holidays = holidaysData;
+    let holidays = await getDataset('gov_holidays', holidaysFallback);
     
     if (year) holidays = holidays.filter(h => h.year === parseInt(year, 10));
     if (month) {
@@ -56,14 +59,12 @@ exports.verifyDocument = async (req, res, next) => {
 
     res.json({
       status: 'success',
-      data: {
+      data: await verificationService.verifyDocument({
         document_number,
         document_type,
-        holder_name: holder_name || null,
-        verified: true,
-        source: 'Mock verification registry',
-        checked_at: new Date().toISOString()
-      }
+        holder_name,
+        requestId: req.requestId
+      })
     });
   } catch (error) { next(error); }
 };

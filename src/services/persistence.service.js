@@ -6,11 +6,14 @@ const STORAGE_DIR = process.env.PERSISTENCE_DIR || path.join(process.cwd(), '.ru
 const writeQueues = new Map();
 
 const COLLECTION_CONFIG = {
+  catalog_datasets: { idField: 'dataset_key' },
   jobs: { idField: 'job_id' },
   payments: { idField: 'payment_id' },
   permits: { idField: 'permit_id' },
+  refresh_tokens: { idField: 'token_id' },
   subscriptions: { idField: 'subscription_id' },
-  tickets: { idField: 'ticket_id' }
+  tickets: { idField: 'ticket_id' },
+  users: { idField: 'user_id' }
 };
 
 const sanitizeMongoDocument = (document = {}) => {

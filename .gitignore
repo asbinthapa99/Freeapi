@@ -25,3 +25,6 @@ implementation_plan.md
 
 # OS junk
 .DS_Store
+
+# MCP config (contains credentials)
+.mcp.json

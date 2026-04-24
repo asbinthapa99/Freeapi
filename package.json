@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "jest --coverage",
+    "test": "jest --runInBand --coverage",
+    "test:integration": "jest --runInBand src/__tests__/integration.test.js",
     "lint": "eslint src/**/*.js"
   },
   "keywords": [

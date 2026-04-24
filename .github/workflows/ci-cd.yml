@@ -1,0 +1,47 @@
+name: CI CD
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+        env:
+          NODE_ENV: test
+          JWT_SECRET: ci-jwt-secret
+          ADMIN_EMAIL: admin@example.com
+          ADMIN_PASSWORD: Password123!
+          ALLOW_PUBLIC_REGISTRATION: "true"
+
+      - name: Build Docker image
+        run: docker build -t nepal-api-ecosystem:${{ github.sha }} .
+
+  deploy:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && secrets.DEPLOY_WEBHOOK_URL != ''
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger deploy webhook
+        run: curl -X POST "${{ secrets.DEPLOY_WEBHOOK_URL }}"

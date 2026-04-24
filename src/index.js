@@ -3,6 +3,7 @@ const app = require('./app');
 const logger = require('./services/logger.service');
 const { connectDatabase } = require('./services/db.service');
 const { seedMongoDatabase } = require('./services/mongoSeed.service');
+const { ensureBootstrapAdmin } = require('./services/auth.service');
 
 const PORT = process.env.PORT || 3000;
 
@@ -14,6 +15,7 @@ const bootstrap = async () => {
         logger.warn({ message: 'MongoDB seed skipped', reason: err.message });
       });
     }
+    await ensureBootstrapAdmin();
 
     app.listen(PORT, () => {
       logger.info({

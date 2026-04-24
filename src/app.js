@@ -6,13 +6,25 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const errorHandler = require('./middleware/error.middleware');
 const logger = require('./services/logger.service');
+const { requestContext } = require('./middleware/observability.middleware');
+const { renderPrometheusMetrics } = require('./services/metrics.service');
+const openApiDocument = require('./docs/openapi');
+const { requireAuth, requirePermission } = require('./middleware/auth.middleware');
+
+const path = require('path');
 
 const app = express();
 
 app.set('trust proxy', process.env.TRUST_PROXY === 'true');
 
+// Landing page
+app.use(express.static(path.join(__dirname, '..', 'landing')));
+
 // Middleware
-app.use(helmet());
+app.use(requestContext);
+app.use(helmet({
+  contentSecurityPolicy: false
+}));
 app.use(cors({
   origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map((item) => item.trim()) : '*'
 }));
@@ -53,6 +65,47 @@ app.get('/health', (req, res) => {
     uptime_seconds: Math.floor(process.uptime()),
     timestamp: new Date().toISOString()
   });
+});
+
+app.get('/ready', (req, res) => {
+  const { isMongoConnected, isMongoConfigured } = require('./services/db.service');
+  const mongoReady = !isMongoConfigured() || isMongoConnected();
+  const statusCode = mongoReady ? 200 : 503;
+
+  res.status(statusCode).json({
+    status: mongoReady ? 'ready' : 'degraded',
+    mongodb: mongoReady ? 'ready' : 'unavailable',
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get('/metrics', requireAuth, requirePermission('metrics:read'), (req, res) => {
+  res.type('text/plain').send(renderPrometheusMetrics());
+});
+
+app.get('/docs/openapi.json', (req, res) => {
+  res.json(openApiDocument);
+});
+
+app.get('/docs', (req, res) => {
+  res.type('html').send(`<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Nepal API Ecosystem Docs</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script>
+      window.ui = SwaggerUIBundle({
+        url: '/docs/openapi.json',
+        dom_id: '#swagger-ui'
+      });
+    </script>
+  </body>
+</html>`);
 });
 
 // Setup routers

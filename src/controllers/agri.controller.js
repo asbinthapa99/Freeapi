@@ -1,10 +1,11 @@
 // KrishiData API Controller - Agriculture
 const kalimatiPrices = require('../data/kalimatiPrices');
+const { getDataset } = require('../services/catalog.service');
 
 exports.getPrices = async (req, res, next) => {
   try {
     const { date, commodity } = req.query;
-    let prices = kalimatiPrices;
+    let prices = await getDataset('agri_kalimati_prices', kalimatiPrices);
     
     if (commodity) {
       prices = prices.filter(p => p.commodity.toLowerCase().includes(commodity.toLowerCase()) || 

@@ -3,11 +3,12 @@ const { v4: uuidv4 } = require('uuid');
 const govDisasterData = require('../data/govDisasterData');
 const liveApi = require('../services/liveApi.service');
 const { appendRecord } = require('../services/persistence.service');
+const { getDataset } = require('../services/catalog.service');
 
 exports.getActiveAlerts = async (req, res, next) => {
   try {
     const { district, severity } = req.query;
-    let alerts = govDisasterData.activeAlerts;
+    let alerts = await getDataset('disaster_active_alerts', govDisasterData.activeAlerts);
     if (district) alerts = alerts.filter(a => a.district.toLowerCase() === district.toLowerCase());
     if (severity) alerts = alerts.filter(a => a.severity === severity.toUpperCase());
     res.json({ status: 'success', data: { count: alerts.length, alerts } });
@@ -17,7 +18,7 @@ exports.getActiveAlerts = async (req, res, next) => {
 exports.getRiverLevels = async (req, res, next) => {
   try {
     const { river, station } = req.query;
-    let stations = govDisasterData.riverStations;
+    let stations = await getDataset('disaster_river_stations', govDisasterData.riverStations);
     if (river) stations = stations.filter(s => s.river.toLowerCase() === river.toLowerCase());
     if (station) stations = stations.filter(s => s.station.toLowerCase() === station.toLowerCase());
     if (stations.length === 0) {
@@ -49,7 +50,7 @@ exports.registerSub = async (req, res, next) => {
 exports.getLandslideRisk = async (req, res, next) => {
   try {
     const { district } = req.query;
-    let zones = govDisasterData.landslideZones;
+    let zones = await getDataset('disaster_landslide_zones', govDisasterData.landslideZones);
     if (district) zones = zones.filter(z => z.district.toLowerCase() === district.toLowerCase());
     res.json({ status: 'success', data: { count: zones.length, zones } });
   } catch (error) { next(error); }

@@ -2,11 +2,12 @@
 const { v4: uuidv4 } = require('uuid');
 const tourismData = require('../data/tourismData');
 const { appendRecord, findRecordByField } = require('../services/persistence.service');
+const { getDataset } = require('../services/catalog.service');
 
 exports.getTrekkingRoutes = async (req, res, next) => {
   try {
     const { region, difficulty } = req.query;
-    let treks = tourismData.treks;
+    let treks = await getDataset('tourism_treks', tourismData.treks);
     if (region) treks = treks.filter(t => t.region.toLowerCase() === region.toLowerCase());
     if (difficulty) treks = treks.filter(t => t.difficulty.toLowerCase() === difficulty.toLowerCase());
     res.json({ status: 'success', data: { count: treks.length, treks } });
@@ -16,7 +17,7 @@ exports.getTrekkingRoutes = async (req, res, next) => {
 exports.getTeahouses = async (req, res, next) => {
   try {
     const { location, max_price } = req.query;
-    let teahouses = tourismData.teahouses;
+    let teahouses = await getDataset('tourism_teahouses', tourismData.teahouses);
     if (location) teahouses = teahouses.filter(t => t.location.toLowerCase() === location.toLowerCase());
     if (max_price) teahouses = teahouses.filter(t => t.price_per_night_npr <= Number(max_price));
     res.json({ status: 'success', data: { count: teahouses.length, teahouses } });
@@ -33,7 +34,8 @@ exports.calculateAltitudeRisk = async (req, res, next) => {
     const max_alt = Math.max(start_alt, end_alt);
     const gain = end_alt - start_alt;
     
-    let riskLevel = tourismData.altitudeRiskTable.find(r => max_alt >= r.min_alt && max_alt < r.max_alt);
+    const altitudeRiskTable = await getDataset('tourism_altitude_risk', tourismData.altitudeRiskTable);
+    let riskLevel = altitudeRiskTable.find(r => max_alt >= r.min_alt && max_alt < r.max_alt);
     if (!riskLevel) riskLevel = { risk: 'UNKNOWN', advice: 'Consult a professional guide.' };
     
     let specific_advice = riskLevel.advice;
@@ -50,7 +52,8 @@ exports.applyPermit = async (req, res, next) => {
       return res.status(400).json({ error: { code: 'MISSING_DATA', message: 'Provide trek_id, passport_number, and nationality.', status: 400 } });
     }
     
-    const trek = tourismData.treks.find(t => t.id === trek_id);
+    const treks = await getDataset('tourism_treks', tourismData.treks);
+    const trek = treks.find(t => t.id === trek_id);
     if (!trek) return res.status(404).json({ error: { code: 'TREK_NOT_FOUND', message: `Trek ID ${trek_id} not found.`, status: 404 } });
     
     let cost = trek.permit_cost_npr;
@@ -95,7 +98,8 @@ exports.generateItinerary = async (req, res, next) => {
       return res.status(400).json({ error: { code: 'MISSING_TREK_ID', message: 'Provide trek_id.', status: 400 } });
     }
 
-    const trek = tourismData.treks.find((item) => item.id === trek_id);
+    const treks = await getDataset('tourism_treks', tourismData.treks);
+    const trek = treks.find((item) => item.id === trek_id);
     if (!trek) {
       return res.status(404).json({ error: { code: 'TREK_NOT_FOUND', message: `Trek ID ${trek_id} not found.`, status: 404 } });
     }

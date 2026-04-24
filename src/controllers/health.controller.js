@@ -1,5 +1,6 @@
 // SwasthyaTriage API Controller - Health Symptom Checker
 const healthData = require('../data/healthData');
+const { getDataset } = require('../services/catalog.service');
 
 const VALID_SYMPTOMS = ['high_fever','joint_pain','rash','headache','body_ache','diarrhea','vomiting','dehydration','cough','fever','breathing_difficulty','chills','sweating','itchy_eyes','sneezing','runny_nose','stomach_pain','nausea','bloating'];
 
@@ -18,7 +19,8 @@ exports.analyzeTriage = async (req, res, next) => {
     // Match symptoms against the symptom map
     const sortedInput = [...symptoms].sort().join(',');
     const conditions = [];
-    for (const [key, condition] of Object.entries(healthData.symptomMap)) {
+    const symptomMap = await getDataset('health_symptom_map', healthData.symptomMap);
+    for (const [key, condition] of Object.entries(symptomMap)) {
       const keySymptoms = key.split(',');
       const matchCount = keySymptoms.filter(s => symptoms.includes(s)).length;
       if (matchCount >= 2) {
@@ -37,7 +39,7 @@ exports.analyzeTriage = async (req, res, next) => {
 exports.getNearbyFacilities = async (req, res, next) => {
   try {
     const { district, type } = req.query;
-    let facilities = healthData.healthFacilities;
+    let facilities = await getDataset('health_facilities', healthData.healthFacilities);
     if (district) facilities = facilities.filter(f => f.district.toLowerCase() === district.toLowerCase());
     if (type) facilities = facilities.filter(f => f.type.toLowerCase() === type.toLowerCase());
     res.json({ status: 'success', data: { count: facilities.length, facilities } });
@@ -47,9 +49,10 @@ exports.getNearbyFacilities = async (req, res, next) => {
 exports.getFirstAid = async (req, res, next) => {
   try {
     const { condition } = req.params;
-    const guide = healthData.firstAid[condition.toLowerCase()];
+    const firstAid = await getDataset('health_first_aid', healthData.firstAid);
+    const guide = firstAid[condition.toLowerCase()];
     if (!guide) {
-      const available = Object.keys(healthData.firstAid);
+      const available = Object.keys(firstAid);
       return res.status(404).json({ error: { code: 'CONDITION_NOT_FOUND', message: `First aid guide not found. Available: ${available.join(', ')}`, status: 404 } });
     }
     res.json({ status: 'success', data: guide });

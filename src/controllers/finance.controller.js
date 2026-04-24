@@ -2,6 +2,8 @@
 const { v4: uuidv4 } = require('uuid');
 const liveApi = require('../services/liveApi.service');
 const { appendRecord } = require('../services/persistence.service');
+const { getDataset } = require('../services/catalog.service');
+const { createPayment } = require('../services/payments.service');
 
 const fallbackRates = [
   { currency: { iso3: 'USD', name: 'US Dollar' }, unit: 1, buy: 133.50, sell: 134.10 },
@@ -10,19 +12,12 @@ const fallbackRates = [
   { currency: { iso3: 'INR', name: 'Indian Rupee' }, unit: 100, buy: 160.00, sell: 160.15 }
 ];
 
-const bankBranches = [
+const bankBranchesFallback = [
   { bank: 'Nabil Bank', district: 'Kathmandu', branch: 'Putalisadak', phone: '01-4422334' },
   { bank: 'Global IME Bank', district: 'Pokhara', branch: 'Lakeside', phone: '061-451122' },
   { bank: 'NIC Asia', district: 'Chitwan', branch: 'Bharatpur', phone: '056-590221' },
   { bank: 'Kumari Bank', district: 'Biratnagar', branch: 'Main Road', phone: '021-536200' }
 ];
-
-const paymentChannels = {
-  ESEWA: { fee_percent: 1.2, settlement: 'instant' },
-  KHALTI: { fee_percent: 1.0, settlement: 'instant' },
-  CONNECT_IPS: { fee_percent: 0.5, settlement: 'same_day' },
-  CARD: { fee_percent: 2.5, settlement: 'T+1' }
-};
 
 const categorizeExpense = (description) => {
   const normalized = description.toLowerCase();
@@ -134,23 +129,28 @@ exports.initiatePayment = async (req, res, next) => {
       return res.status(400).json({ error: { code: 'MISSING_PAYMENT_FIELDS', message: 'Provide amount and channel.', status: 400 } });
     }
 
-    const channelKey = channel.toUpperCase();
-    const selectedChannel = paymentChannels[channelKey];
-    if (!selectedChannel) {
-      return res.status(400).json({ error: { code: 'INVALID_CHANNEL', message: `Unsupported channel. Allowed: ${Object.keys(paymentChannels).join(', ')}`, status: 400 } });
-    }
+    const providerPayment = await createPayment({
+      amount,
+      currency,
+      channel,
+      reference,
+      requestId: req.requestId
+    });
 
-    const fee = Number(((Number(amount) * selectedChannel.fee_percent) / 100).toFixed(2));
     const payment = {
       payment_id: `PAY-${uuidv4().slice(0, 8).toUpperCase()}`,
       reference: reference || null,
       amount: Number(amount),
       currency,
-      channel: channelKey,
-      fee,
-      settlement: selectedChannel.settlement,
-      payment_url: `https://payments.example.local/${channelKey.toLowerCase()}/${Date.now()}`,
-      status: 'PENDING',
+      channel: providerPayment.channel,
+      fee: providerPayment.fee,
+      settlement: providerPayment.settlement,
+      payment_url: providerPayment.payment_url,
+      provider: providerPayment.provider,
+      provider_reference: providerPayment.provider_reference,
+      integration_mode: providerPayment.integration_mode,
+      client_secret: providerPayment.client_secret,
+      status: providerPayment.status,
       created_at: new Date().toISOString()
     };
 
@@ -164,6 +164,7 @@ exports.initiatePayment = async (req, res, next) => {
 
 exports.getBankBranches = async (req, res, next) => {
   try {
+    const bankBranches = await getDataset('finance_bank_branches', bankBranchesFallback);
     const { bank, district } = req.query;
     let branches = bankBranches;
 

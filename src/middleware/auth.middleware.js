@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
+const { hasPermission } = require('../config/rbac');
+const { findUserById, sanitizeUser } = require('../services/auth.service');
 
-const requireAuth = (req, res, next) => {
+const requireAuth = async (req, res, next) => {
   const authHeader = req.headers.authorization || '';
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
@@ -25,7 +27,29 @@ const requireAuth = (req, res, next) => {
   }
 
   try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    if (payload.token_type && payload.token_type !== 'access') {
+      return res.status(401).json({
+        error: {
+          code: 'INVALID_TOKEN',
+          message: 'Access token is required.',
+          status: 401
+        }
+      });
+    }
+
+    const storedUser = await findUserById(payload.sub);
+    if (!storedUser || storedUser.status !== 'ACTIVE') {
+      return res.status(401).json({
+        error: {
+          code: 'USER_INACTIVE',
+          message: 'User account is inactive.',
+          status: 401
+        }
+      });
+    }
+
+    req.user = sanitizeUser(storedUser);
     return next();
   } catch (error) {
     return res.status(401).json({
@@ -39,7 +63,7 @@ const requireAuth = (req, res, next) => {
 };
 
 const requireAdmin = (req, res, next) => {
-  if (!req.user || req.user.role !== 'admin') {
+  if (!req.user || !hasPermission(req.user, 'users:write')) {
     return res.status(403).json({
       error: {
         code: 'ADMIN_REQUIRED',
@@ -52,7 +76,22 @@ const requireAdmin = (req, res, next) => {
   return next();
 };
 
+const requirePermission = (permission) => (req, res, next) => {
+  if (!req.user || !hasPermission(req.user, permission)) {
+    return res.status(403).json({
+      error: {
+        code: 'FORBIDDEN',
+        message: `Permission ${permission} is required.`,
+        status: 403
+      }
+    });
+  }
+
+  return next();
+};
+
 module.exports = {
   requireAuth,
-  requireAdmin
+  requireAdmin,
+  requirePermission
 };
