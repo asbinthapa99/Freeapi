@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "mongodb": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mongodb-js/mongodb-mcp-server",
+        "--connectionString",
+        "mongodb://genz_db_user:3nY-%40y.aMjAmgZ%40@atlas-sql-69eba48afce5529495343fdb-3orm3v.a.query.mongodb.net/asbin?ssl=true&authSource=admin"
+      ]
+    }
+  }
+}
