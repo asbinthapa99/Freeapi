@@ -27,8 +27,10 @@ const bootstrap = async () => {
   } catch (error) {
     logger.error({
       message: 'Application startup failed',
-      error: error.message
+      error: error.message,
+      stack: error.stack
     });
+    process.stderr.write(`STARTUP CRASH: ${error.message}\n${error.stack}\n`);
     process.exit(1);
   }
 };

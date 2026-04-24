@@ -56,7 +56,7 @@ const connectDatabase = async () => {
       error: error.message
     });
 
-    if (process.env.MONGO_REQUIRED === 'true' || process.env.NODE_ENV === 'production') {
+    if (process.env.MONGO_REQUIRED === 'true') {
       throw error;
     }
 
