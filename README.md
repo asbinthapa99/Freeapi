@@ -2,25 +2,7 @@
 
 **10 free, production-ready REST APIs built for Nepal.** Agriculture prices, trekking permits, health triage, transport booking, forex rates, job matching, and more — all under one base URL.
 
-> 📖 **Swagger Docs:** `/docs` &nbsp;|&nbsp; ⚡ **Health:** `/health`
-
----
-
-## Current Release
-
-- Tag: `v1.2.0`
-- Target: `main`
-- Release commit: `02091d9`
-- Release URL: `https://github.com/asbinthapa99/Freeapi/releases/tag/v1.2.0`
-
-Release notes cover:
-- platform highlights
-- auth/RBAC
-- Swagger/OpenAPI
-- metrics/observability
-- CI/CD
-- validation
-- attribution-required license
+> 📖 **Swagger Docs:** [`/docs`](https://nepal-api-production.up.railway.app/docs) &nbsp;|&nbsp; ⚡ **Health:** [`/health`](https://nepal-api-production.up.railway.app/health) &nbsp;|&nbsp; 🌐 **Landing:** [freeapi-six.vercel.app](https://freeapi-six.vercel.app)
 
 ---
 
@@ -40,25 +22,15 @@ No API key needed for public read endpoints. Write endpoints require a Bearer to
 # Health check
 curl https://nepal-api-production.up.railway.app/health
 
-# Live forex rates (NPR)
+# Live NRB forex rates
 curl https://nepal-api-production.up.railway.app/api/v1/finance/forex/rates
 
-# Trekking routes
-curl https://nepal-api-production.up.railway.app/api/v1/tourism/treks/routes
+# Live USGS earthquakes (Nepal region)
+curl https://nepal-api-production.up.railway.app/api/v1/disaster/earthquakes/recent
 
 # Job search
 curl "https://nepal-api-production.up.railway.app/api/v1/jobs/search?category=IT&location=Kathmandu"
 ```
-
----
-
-## Swagger Preview
-
-Interactive API docs are available at `/docs`.
-
-![Swagger UI Preview 1](<Screenshot 2026-04-24 at 23.08.31.png>)
-
-![Swagger UI Preview](<Screenshot 2026-04-24 at 23.09.28.png>)
 
 ---
 
@@ -69,9 +41,12 @@ Interactive API docs are available at `/docs`.
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | POST | `/auth/login` | — | Login, returns Bearer token |
-| POST | `/auth/register` | Admin | Create a new user |
+| POST | `/auth/register` | — | Self-register (if open registration enabled) |
 | POST | `/auth/refresh` | — | Refresh access token |
+| POST | `/auth/logout` | — | Invalidate refresh token |
+| GET | `/auth/me` | Bearer | Current user profile |
 | GET | `/auth/users` | Admin | List all users |
+| POST | `/auth/users` | Admin | Create a user |
 | PATCH | `/auth/users/:user_id` | Admin | Update user |
 | DELETE | `/auth/users/:user_id` | Admin | Delete user |
 
@@ -99,11 +74,16 @@ curl -X POST https://nepal-api-production.up.railway.app/api/v1/language/transla
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/agri/prices/kalimati` | — | Catalog-backed Kalimati market prices |
+| GET | `/agri/prices/kalimati` | — | Live Kalimati market prices |
 | GET | `/agri/crops/calendar` | — | Planting/harvest calendar |
-| GET | `/agri/weather/forecast` | — | Farm weather forecast |
+| GET | `/agri/weather/forecast?lat=&lon=` | — | Live weather via Open-Meteo |
 | POST | `/agri/disease/analyze` | — | Crop disease diagnosis |
 | POST | `/agri/fertilizer/recommend` | — | Fertilizer recommendations |
+
+```bash
+# Live weather for Kathmandu
+curl "https://nepal-api-production.up.railway.app/api/v1/agri/weather/forecast?lat=27.7172&lon=85.324"
+```
 
 ---
 
@@ -111,11 +91,16 @@ curl -X POST https://nepal-api-production.up.railway.app/api/v1/language/transla
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/disaster/alerts/active` | — | Catalog-backed active disaster alerts |
-| GET | `/disaster/rivers/levels` | — | Catalog-backed river monitoring data |
-| GET | `/disaster/earthquakes/recent` | — | Live USGS earthquake data |
-| GET | `/disaster/landslide/risk-zones` | — | Catalog-backed landslide risk zones |
-| POST | `/disaster/subscribe` | — | Subscribe to SMS alerts |
+| GET | `/disaster/alerts/active` | — | Active disaster alerts |
+| GET | `/disaster/rivers/levels` | — | River monitoring stations |
+| GET | `/disaster/earthquakes/recent` | — | Live USGS earthquakes (Nepal region) |
+| GET | `/disaster/landslide-risk` | — | Landslide risk zones |
+| POST | `/disaster/subscriptions/register` | — | Subscribe to SMS alerts |
+
+```bash
+# Real-time earthquakes (M3.5+, Nepal region)
+curl https://nepal-api-production.up.railway.app/api/v1/disaster/earthquakes/recent
+```
 
 ---
 
@@ -123,12 +108,12 @@ curl -X POST https://nepal-api-production.up.railway.app/api/v1/language/transla
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/tourism/treks/routes` | — | All trekking routes |
+| GET | `/tourism/treks/routes` | — | Trekking routes (OSM-backed) |
 | POST | `/tourism/permits/apply` | — | Apply for trekking permit |
 | GET | `/tourism/permits/:permit_id/status` | — | Check permit status |
 | POST | `/tourism/itinerary/generate` | — | AI itinerary generator |
-| GET | `/tourism/teahouses/availability` | — | Teahouse availability |
-| POST | `/tourism/altitude/risk` | — | Altitude sickness risk |
+| GET | `/tourism/teahouses/availability` | — | Teahouse/lodge availability (OSM) |
+| POST | `/tourism/health/altitude-risk` | — | Altitude sickness risk |
 
 ```bash
 curl -X POST https://nepal-api-production.up.railway.app/api/v1/tourism/permits/apply \
@@ -142,13 +127,18 @@ curl -X POST https://nepal-api-production.up.railway.app/api/v1/tourism/permits/
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/finance/forex/rates` | — | Live NRB forex rates |
+| GET | `/finance/forex/rates` | — | Live NRB forex rates (NPR) |
+| GET | `/finance/inflation` | — | Live inflation data (World Bank) |
 | POST | `/finance/remittance/calculate` | — | Remittance calculator |
-| POST | `/finance/payment/initiate` | — | Initiate eSewa/Khalti payment |
-| GET | `/finance/payment/:tracking_code/status` | — | Payment status |
-| GET | `/finance/banks/branches` | — | Bank branch locator |
+| GET | `/finance/remittance/:tracking_code` | — | Remittance status |
+| POST | `/finance/payments/initiate` | Bearer | Initiate eSewa/Khalti payment |
+| GET | `/finance/banks/branches` | — | Bank branches (OSM-backed) |
 | POST | `/finance/budget/categorize` | — | Budget categorizer |
-| GET | `/finance/microfinance/list` | — | Microfinance institutions |
+
+```bash
+# Live NRB forex (USD, EUR, GBP, INR, etc.)
+curl https://nepal-api-production.up.railway.app/api/v1/finance/forex/rates
+```
 
 ---
 
@@ -157,8 +147,10 @@ curl -X POST https://nepal-api-production.up.railway.app/api/v1/tourism/permits/
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | POST | `/education/tutor/ask` | — | AI tutor (any subject/grade) |
-| GET | `/education/syllabus/:grade` | — | Syllabus by grade (1–12) |
-| GET | `/education/past-papers` | — | Past exam papers |
+| GET | `/education/syllabus/:grade` | — | Syllabus by grade (`SEE`, `PLUS_TWO`, `1`–`12`) |
+| GET | `/education/syllabus/topics` | — | All syllabus topics |
+| GET | `/education/past-papers` | — | Past exam papers list |
+| GET | `/education/past-papers/:subject/:year` | — | Specific past paper |
 | POST | `/education/grade/objective` | — | Grade objective answers |
 | POST | `/education/grade/essay` | — | Grade essay answers |
 
@@ -169,10 +161,10 @@ curl -X POST https://nepal-api-production.up.railway.app/api/v1/tourism/permits/
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | POST | `/health/triage/analyze` | — | Symptom-based triage |
-| GET | `/health/facilities/nearby` | — | Nearby health facilities |
+| GET | `/health/facilities/nearby` | — | Nearby health facilities (OSM-backed) |
 | GET | `/health/first-aid/:condition` | — | First-aid guide |
 | GET | `/health/diseases/outbreaks` | — | Disease outbreak monitor |
-| POST | `/health/records/sync` | Admin | Sync health records |
+| POST | `/health/sync/offline-records` | Admin | Sync health records |
 
 ```bash
 curl -X POST https://nepal-api-production.up.railway.app/api/v1/health/triage/analyze \
@@ -186,12 +178,12 @@ curl -X POST https://nepal-api-production.up.railway.app/api/v1/health/triage/an
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/gov/holidays` | — | Catalog-backed public holidays |
+| GET | `/gov/holidays` | — | Public holidays |
+| GET | `/gov/holidays/:year` | — | Holidays for a specific year |
 | GET | `/gov/tax/vehicle-rates` | — | Vehicle tax rates |
-| POST | `/gov/documents/verify` | — | Document verification |
-| GET | `/gov/offices/ward` | — | Ward office locator |
-| GET | `/gov/applications/:tracking_id/status` | — | Application status |
-| POST | `/gov/applications/submit` | — | Submit application |
+| POST | `/gov/documents/verify` | Admin | Document verification |
+| GET | `/gov/offices/ward` | — | Ward offices (OSM-backed) |
+| GET | `/gov/applications/status/:tracking_id` | — | Application status |
 
 ---
 
@@ -199,10 +191,11 @@ curl -X POST https://nepal-api-production.up.railway.app/api/v1/health/triage/an
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/jobs/search` | — | Search jobs (category, location, type) |
+| GET | `/jobs/search` | — | Search jobs (`category`, `location`, `type`) |
+| GET | `/jobs/categories` | — | All job categories |
 | POST | `/jobs/resume/parse` | — | Extract skills from resume text |
 | POST | `/jobs/match` | — | Match candidate to open jobs |
-| GET | `/jobs/demand/:lt_number` | — | Foreign demand letter lookup |
+| GET | `/jobs/foreign-demands/verify/:lt_number` | — | Foreign demand letter lookup |
 | POST | `/jobs/post` | Admin | Post a job listing |
 
 ```bash
@@ -215,13 +208,12 @@ curl "https://nepal-api-production.up.railway.app/api/v1/jobs/search?category=IT
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/transport/routes/search` | — | City bus routes |
+| GET | `/transport/routes/search` | — | Bus stop search (OSM-backed) |
 | GET | `/transport/routes/intercity` | — | Intercity routes |
-| GET | `/transport/fare/calculate` | — | Fare calculator |
-| GET | `/transport/buses/:bus_id/schedule` | — | Bus schedule |
+| GET | `/transport/fares/calculate` | — | Fare calculator |
+| GET | `/transport/seats/:trip_id` | — | Available seats |
+| GET | `/transport/buses/:bus_id/location` | — | Live bus location |
 | POST | `/transport/tickets/book` | — | Book a ticket |
-| GET | `/transport/tickets/:trip_id/status` | — | Ticket status |
-| GET | `/transport/buses/:bus_id/live` | — | Live bus tracking |
 
 ---
 
@@ -243,38 +235,29 @@ curl -H "Authorization: Bearer $TOKEN" \
 
 ---
 
-## Live Data
+## Live Data Sources
 
-These routes now use free live providers where public data exists:
+These routes fetch real data from free public APIs:
 
-- `/api/v1/finance/forex/rates` from Nepal Rastra Bank
-- `/api/v1/finance/inflation` from World Bank
-- `/api/v1/finance/banks/branches` from OpenStreetMap
-- `/api/v1/disaster/earthquakes/recent` from USGS
-- `/api/v1/agri/weather/forecast` from Open-Meteo, with OpenWeatherMap as optional fallback
-- `/api/v1/agri/prices/kalimati` from the Kalimati market portal when reachable
-- `/api/v1/health/facilities/nearby` from OpenStreetMap
-- `/api/v1/gov/offices/ward` from OpenStreetMap
-- `/api/v1/tourism/treks/routes` from OpenStreetMap hiking/tourism data
-- `/api/v1/tourism/teahouses/availability` from OpenStreetMap lodging data
-- `/api/v1/transport/routes/search` from OpenStreetMap public transport data
+| Endpoint | Provider |
+|----------|----------|
+| `/finance/forex/rates` | Nepal Rastra Bank |
+| `/finance/inflation` | World Bank |
+| `/finance/banks/branches` | OpenStreetMap (Overpass) |
+| `/disaster/earthquakes/recent` | USGS Earthquake Hazards |
+| `/agri/weather/forecast` | Open-Meteo (free, no key) |
+| `/agri/prices/kalimati` | Kalimati Market Portal |
+| `/health/facilities/nearby` | OpenStreetMap (Overpass) |
+| `/gov/offices/ward` | OpenStreetMap (Overpass) |
+| `/tourism/treks/routes` | OpenStreetMap (Overpass) |
+| `/tourism/teahouses/availability` | OpenStreetMap (Overpass) |
+| `/transport/routes/search` | OpenStreetMap (Overpass) |
 
-To prevent fake fallback responses in production, set:
+All live endpoints fall back to cached/simulated data when a provider is unreachable. To force `503` instead of fallback data:
 
 ```env
 LIVE_DATA_STRICT=true
-LIVE_PROVIDERS_DISABLED=false
 ```
-
-With strict mode enabled, the API returns `503` when a live provider is unavailable instead of returning simulated data.
-
-Some workflows still need private/operator providers for true real-time data:
-
-- live bus GPS
-- live seat inventory
-- permit status from official permit systems
-- private job-board feeds
-- real payment status without configured payment provider keys
 
 ---
 
@@ -309,16 +292,18 @@ Some workflows still need private/operator providers for true real-time data:
 
 ## Deploy Your Own
 
-### Vercel
+### Railway (recommended)
 
 1. Fork this repo
-2. Go to [vercel.com](https://vercel.com) → New Project → import your fork
+2. Go to [railway.app](https://railway.app) → New Project → Deploy from GitHub repo
 3. Add environment variables:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `MONGO_URI` | Yes | MongoDB Atlas connection string |
 | `JWT_SECRET` | Yes | Any long random string |
+| `ADMIN_EMAIL` | Optional | Seed admin account email |
+| `ADMIN_PASSWORD` | Optional | Seed admin account password |
 
 4. Deploy — done.
 
@@ -328,7 +313,7 @@ Some workflows still need private/operator providers for true real-time data:
 git clone https://github.com/asbinthapa99/Freeapi.git
 cd Freeapi
 npm install
-# Create .env (see .env.example)
+cp .env.example .env   # fill in MONGO_URI and JWT_SECRET
 npm run dev
 # → http://localhost:3000
 ```
@@ -339,43 +324,6 @@ npm run dev
 docker build -t nepal-api .
 docker run -p 3000:3000 --env-file .env nepal-api
 ```
-
----
-
-## Render Deploy
-
-This backend is a better fit for Render than Vercel because it runs as a
-long-lived Express server and can keep normal Node process behavior.
-
-Recommended setup:
-
-1. Create a new `Web Service` on Render from this repository.
-2. Use the included [`render.yaml`](render.yaml) blueprint or set:
-   `Build Command: npm install`
-   `Start Command: npm start`
-3. Add required environment variables:
-   `JWT_SECRET`
-   `ADMIN_EMAIL`
-   `ADMIN_PASSWORD`
-   `MONGO_URI`
-   `MONGO_DB_NAME`
-   `CORS_ORIGIN`
-   `CORS_ALLOW_VERCEL_PREVIEWS=true`
-4. Use MongoDB Atlas for persistence.
-5. Point your Vercel frontend to the Render API URL, for example:
-   `NEXT_PUBLIC_API_URL=https://your-render-service.onrender.com`
-
-CORS note:
-
-- Set `CORS_ORIGIN` to your production frontend URL, for example `https://freeapi-six.vercel.app`
-- You can provide multiple origins as a comma-separated list
-- `CORS_ALLOW_VERCEL_PREVIEWS=true` also allows Vercel preview deployment origins like `https://your-branch.vercel.app`
-
-Production note:
-
-- Do not rely on local file persistence in production.
-- Set `MONGO_REQUIRED=true`.
-- Keep `ALLOW_PUBLIC_REGISTRATION=false` unless you explicitly want open signups.
 
 ---
 
@@ -390,30 +338,16 @@ Production note:
 | API Docs | Swagger UI (`/docs`) |
 | Logging | Winston + Morgan |
 | Security | Helmet, CORS, rate-limit |
+| Caching | node-cache (5–30 min TTL per endpoint) |
 
 ---
 
 ## License
 
-This project is free to use, copy, modify, and deploy, but you must give
-credit to the original author.
-
-Required attribution:
+Free to use with required attribution.
 
 ```text
 Original work by Asbin Thapa - Nepal API Ecosystem
 ```
 
-Files:
-
-- `LICENSE`
-- `CODE_OF_CONDUCT.md`
-
-This repository is not MIT-licensed. It uses an attribution-required
-license included in the root `LICENSE` file.
-
----
-
-## License
-
-Free to use with required attribution. See `LICENSE`.
+See `LICENSE` for full terms.
