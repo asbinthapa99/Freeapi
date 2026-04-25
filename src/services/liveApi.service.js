@@ -5,6 +5,8 @@ const cache = new NodeCache({ stdTTL: 600 });
 const isStrictLiveMode = () => process.env.LIVE_DATA_STRICT === 'true';
 const areLiveProvidersEnabled = () => process.env.NODE_ENV !== 'test' && process.env.LIVE_PROVIDERS_DISABLED !== 'true';
 const defaultTimeout = () => Number(process.env.LIVE_PROVIDER_TIMEOUT_MS) || 8000;
+const nepalBbox = '(26,80,31,89)';
+const kathmanduValleyBbox = '(27.55,85.15,27.85,85.55)';
 
 const getCache = (key) => cache.get(key);
 const setCache = (key, value, ttl = 600) => {
@@ -169,12 +171,11 @@ exports.fetchHealthFacilities = async ({ district, type, limit = 50 } = {}) => {
   const cacheKey = `osm:health:${district || 'all'}:${type || 'all'}:${limit}`;
   const query = `
     [out:json][timeout:25];
-    area["ISO3166-1"="NP"][admin_level=2]->.np;
     (
-      nwr["amenity"~"^(hospital|clinic|doctors|pharmacy|dentist)$"](area.np);
-      nwr["healthcare"](area.np);
+      node["amenity"~"^(hospital|clinic|doctors|pharmacy|dentist)$"]${nepalBbox};
+      node["healthcare"]${nepalBbox};
     );
-    out center tags ${Number(limit)};
+    out tags center ${Number(limit)};
   `;
   const elements = await fetchOverpass(cacheKey, query);
   if (!elements) return null;
@@ -203,12 +204,11 @@ exports.fetchBankBranches = async ({ district, bank, limit = 50 } = {}) => {
   const cacheKey = `osm:banks:${district || 'all'}:${bank || 'all'}:${limit}`;
   const query = `
     [out:json][timeout:25];
-    area["ISO3166-1"="NP"][admin_level=2]->.np;
     (
-      nwr["amenity"="bank"](area.np);
-      nwr["office"~"^(financial|bank)$"](area.np);
+      node["amenity"="bank"]${nepalBbox};
+      node["office"~"^(financial|bank)$"]${nepalBbox};
     );
-    out center tags ${Number(limit)};
+    out tags center ${Number(limit)};
   `;
   const elements = await fetchOverpass(cacheKey, query);
   if (!elements) return null;
@@ -236,13 +236,10 @@ exports.fetchGovernmentOffices = async ({ municipality, ward, limit = 50 } = {})
   const cacheKey = `osm:gov:${municipality || 'all'}:${ward || 'all'}:${limit}`;
   const query = `
     [out:json][timeout:25];
-    area["ISO3166-1"="NP"][admin_level=2]->.np;
     (
-      nwr["office"="government"](area.np);
-      nwr["amenity"="townhall"](area.np);
-      nwr["name"~"Ward|Municipality|Rural Municipality|पालिका|वडा", i](area.np);
+      node["office"="government"]${nepalBbox};
     );
-    out center tags ${Number(limit)};
+    out tags center ${Number(limit)};
   `;
   const elements = await fetchOverpass(cacheKey, query);
   if (!elements) return null;
@@ -271,12 +268,11 @@ exports.fetchTourismRoutes = async ({ region, limit = 50 } = {}) => {
   const cacheKey = `osm:tourism-routes:${region || 'all'}:${limit}`;
   const query = `
     [out:json][timeout:25];
-    area["ISO3166-1"="NP"][admin_level=2]->.np;
     (
-      relation["route"~"^(hiking|foot)$"](area.np);
-      nwr["tourism"~"^(attraction|viewpoint)$"](area.np);
+      node["tourism"~"^(attraction|viewpoint)$"]${nepalBbox};
+      node["natural"="peak"]${nepalBbox};
     );
-    out center tags ${Number(limit)};
+    out tags center ${Number(limit)};
   `;
   const elements = await fetchOverpass(cacheKey, query);
   if (!elements) return null;
@@ -303,11 +299,10 @@ exports.fetchTourismPlaces = async ({ location, limit = 50 } = {}) => {
   const cacheKey = `osm:tourism-places:${location || 'all'}:${limit}`;
   const query = `
     [out:json][timeout:25];
-    area["ISO3166-1"="NP"][admin_level=2]->.np;
     (
-      nwr["tourism"~"^(guest_house|hotel|hostel|alpine_hut|camp_site)$"](area.np);
+      node["tourism"~"^(guest_house|hotel|hostel|alpine_hut|camp_site)$"]${nepalBbox};
     );
-    out center tags ${Number(limit)};
+    out tags center ${Number(limit)};
   `;
   const elements = await fetchOverpass(cacheKey, query);
   if (!elements) return null;
@@ -334,13 +329,11 @@ exports.fetchTransportRoutes = async ({ start, end, limit = 50 } = {}) => {
   const cacheKey = `osm:transport:${start || 'all'}:${end || 'all'}:${limit}`;
   const query = `
     [out:json][timeout:25];
-    area["ISO3166-1"="NP"][admin_level=2]->.np;
     (
-      relation["route"~"^(bus|trolleybus)$"](area.np);
-      nwr["highway"="bus_stop"](area.np);
-      nwr["public_transport"~"^(stop_position|platform)$"](area.np);
+      node["highway"="bus_stop"]${kathmanduValleyBbox};
+      node["public_transport"~"^(stop_position|platform)$"]${kathmanduValleyBbox};
     );
-    out center tags ${Number(limit)};
+    out tags center ${Number(limit)};
   `;
   const elements = await fetchOverpass(cacheKey, query);
   if (!elements) return null;
@@ -374,7 +367,7 @@ exports.fetchWorldBankIndicator = async (indicator, { perPage = 5 } = {}) => {
 
   try {
     const { data } = await axios.get(`https://api.worldbank.org/v2/country/NP/indicator/${indicator}`, {
-      params: { format: 'json', per_page: perPage, mrnev: 1 },
+      params: { format: 'json', per_page: perPage },
       timeout: defaultTimeout()
     });
     const rows = Array.isArray(data) ? data[1] || [] : [];
