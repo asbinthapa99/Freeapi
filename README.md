@@ -27,7 +27,7 @@ Release notes cover:
 ## Base URL
 
 ```
-https://your-app.vercel.app/api/v1
+https://nepal-api-production.up.railway.app/api/v1
 ```
 
 No API key needed for public read endpoints. Write endpoints require a Bearer token — see [Authentication](#authentication).
@@ -38,16 +38,16 @@ No API key needed for public read endpoints. Write endpoints require a Bearer to
 
 ```bash
 # Health check
-curl https://your-app.vercel.app/health
+curl https://nepal-api-production.up.railway.app/health
 
 # Live forex rates (NPR)
-curl https://your-app.vercel.app/api/v1/finance/forex/rates
+curl https://nepal-api-production.up.railway.app/api/v1/finance/forex/rates
 
 # Trekking routes
-curl https://your-app.vercel.app/api/v1/tourism/treks/routes
+curl https://nepal-api-production.up.railway.app/api/v1/tourism/treks/routes
 
 # Job search
-curl "https://your-app.vercel.app/api/v1/jobs/search?category=IT&location=Kathmandu"
+curl "https://nepal-api-production.up.railway.app/api/v1/jobs/search?category=IT&location=Kathmandu"
 ```
 
 ---
@@ -88,7 +88,7 @@ Interactive API docs are available at `/docs`.
 | GET | `/language/detect?text=...` | — | Detect language |
 
 ```bash
-curl -X POST https://your-app.vercel.app/api/v1/language/translate \
+curl -X POST https://nepal-api-production.up.railway.app/api/v1/language/translate \
   -H "Content-Type: application/json" \
   -d '{"text":"Hello","source_lang":"en","target_lang":"ne"}'
 ```
@@ -131,7 +131,7 @@ curl -X POST https://your-app.vercel.app/api/v1/language/translate \
 | POST | `/tourism/altitude/risk` | — | Altitude sickness risk |
 
 ```bash
-curl -X POST https://your-app.vercel.app/api/v1/tourism/permits/apply \
+curl -X POST https://nepal-api-production.up.railway.app/api/v1/tourism/permits/apply \
   -H "Content-Type: application/json" \
   -d '{"trek_id":"EBC","passport_number":"P123456","nationality":"Foreign"}'
 ```
@@ -175,7 +175,7 @@ curl -X POST https://your-app.vercel.app/api/v1/tourism/permits/apply \
 | POST | `/health/records/sync` | Admin | Sync health records |
 
 ```bash
-curl -X POST https://your-app.vercel.app/api/v1/health/triage/analyze \
+curl -X POST https://nepal-api-production.up.railway.app/api/v1/health/triage/analyze \
   -H "Content-Type: application/json" \
   -d '{"symptoms":["high_fever","joint_pain","rash"],"patient_age":28}'
 ```
@@ -206,7 +206,7 @@ curl -X POST https://your-app.vercel.app/api/v1/health/triage/analyze \
 | POST | `/jobs/post` | Admin | Post a job listing |
 
 ```bash
-curl "https://your-app.vercel.app/api/v1/jobs/search?category=IT&location=Kathmandu"
+curl "https://nepal-api-production.up.railway.app/api/v1/jobs/search?category=IT&location=Kathmandu"
 ```
 
 ---
@@ -231,14 +231,14 @@ Admin endpoints require a Bearer token:
 
 ```bash
 # 1. Get token
-TOKEN=$(curl -s -X POST https://your-app.vercel.app/api/v1/auth/login \
+TOKEN=$(curl -s -X POST https://nepal-api-production.up.railway.app/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@nepalapi.dev","password":"NepalApi@2024!"}' \
   | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['token'])")
 
 # 2. Use it
 curl -H "Authorization: Bearer $TOKEN" \
-  https://your-app.vercel.app/api/v1/auth/users
+  https://nepal-api-production.up.railway.app/api/v1/auth/users
 ```
 
 ---

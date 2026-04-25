@@ -1,4 +1,4 @@
-const BASE = window.location.origin;
+const BASE = 'https://nepal-api-production.up.railway.app';
 
 // ── 3D Matrix Code-Rain Canvas ──
 (function () {
@@ -162,7 +162,7 @@ function runLive(btn) {
       btn.disabled = false;
     })
     .catch(err => {
-      pre.textContent = 'Error: ' + err.message + '\n\nMake sure the server is running on localhost:3000';
+      pre.textContent = 'Error: ' + err.message;
       pre.classList.add('run-error');
       btn.innerHTML = '▶ Run Live';
       btn.disabled = false;

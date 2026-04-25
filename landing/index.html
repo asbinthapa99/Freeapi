@@ -24,16 +24,16 @@
       <a href="#apis">APIs</a>
       <a href="#features">Features</a>
       <a href="#examples">Examples</a>
-      <a href="/docs" target="_blank">Docs</a>
+      <a href="https://nepal-api-production.up.railway.app/docs" target="_blank">Docs</a>
       <a href="https://github.com/asbinthapa99/Freeapi" target="_blank">GitHub</a>
-      <a href="/health" target="_blank" class="nav-status">
+      <a href="https://nepal-api-production.up.railway.app/health" target="_blank" class="nav-status">
         <span class="status-dot"></span> Live
       </a>
     </div>
     <div class="nav-cta">
       <a href="https://github.com/asbinthapa99/Freeapi" target="_blank" class="btn btn-ghost">⭐ Source</a>
-      <a href="/docs" target="_blank" class="btn btn-ghost">View Docs</a>
-      <a href="/docs" target="_blank" class="btn btn-primary">Try Free →</a>
+      <a href="https://nepal-api-production.up.railway.app/docs" target="_blank" class="btn btn-ghost">View Docs</a>
+      <a href="https://nepal-api-production.up.railway.app/docs" target="_blank" class="btn btn-primary">Try Free →</a>
     </div>
     <button class="nav-mobile-toggle" id="mobileToggle" aria-label="Menu">☰</button>
   </div>
@@ -42,9 +42,9 @@
   <a href="#apis" onclick="closeMobile()">APIs</a>
   <a href="#features" onclick="closeMobile()">Features</a>
   <a href="#examples" onclick="closeMobile()">Examples</a>
-  <a href="/docs" target="_blank" onclick="closeMobile()">View Docs</a>
+  <a href="https://nepal-api-production.up.railway.app/docs" target="_blank" onclick="closeMobile()">View Docs</a>
   <a href="https://github.com/asbinthapa99/Freeapi" target="_blank">⭐ Source Code</a>
-  <a href="/docs" target="_blank">Try Free →</a>
+  <a href="https://nepal-api-production.up.railway.app/docs" target="_blank">Try Free →</a>
 </div>
 
 <!-- HERO -->
@@ -88,7 +88,7 @@
       </div>
       <div class="code-body">
         <pre id="snippet-curl" class="snippet active"><code><span class="c-comment"># Apply for a trekking permit</span>
-<span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> http://localhost:3000/api/v1/tourism/permits/apply \
+<span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> https://nepal-api-production.up.railway.app/api/v1/tourism/permits/apply \
   <span class="c-flag">-H</span> <span class="c-str">"Content-Type: application/json"</span> \
   <span class="c-flag">-d</span> <span class="c-str">'{"trek_id":"EBC","passport_number":"P123456","nationality":"Foreign"}'</span>
 
@@ -104,7 +104,7 @@
 }</code></pre>
 
         <pre id="snippet-js" class="snippet"><code><span class="c-comment">// Apply for a trekking permit</span>
-<span class="c-kw">const</span> response = <span class="c-kw">await</span> fetch(<span class="c-str">'http://localhost:3000/api/v1/tourism/permits/apply'</span>, {
+<span class="c-kw">const</span> response = <span class="c-kw">await</span> fetch(<span class="c-str">'https://nepal-api-production.up.railway.app/api/v1/tourism/permits/apply'</span>, {
   method: <span class="c-str">'POST'</span>,
   headers: { <span class="c-str">'Content-Type'</span>: <span class="c-str">'application/json'</span> },
   body: JSON.stringify({
@@ -121,7 +121,7 @@ console.log(data.permit_id); <span class="c-comment">// PRMT-9FFE4A8F</span></co
 
 <span class="c-comment"># Apply for a trekking permit</span>
 res = requests.post(
-    <span class="c-str">'http://localhost:3000/api/v1/tourism/permits/apply'</span>,
+    <span class="c-str">'https://nepal-api-production.up.railway.app/api/v1/tourism/permits/apply'</span>,
     json={
         <span class="c-str">'trek_id'</span>: <span class="c-str">'EBC'</span>,
         <span class="c-str">'passport_number'</span>: <span class="c-str">'P123456'</span>,
@@ -663,7 +663,7 @@ data = res.json()[<span class="c-str">'data'</span>]
             <span class="method get">GET</span>
             <code>/health</code>
           </div>
-          <pre class="code-block"><code><span class="c-cmd">curl</span> http://localhost:3000/health
+          <pre class="code-block"><code><span class="c-cmd">curl</span> https://nepal-api-production.up.railway.app/health
 
 <span class="c-comment"># 200 OK</span>
 {
@@ -683,7 +683,7 @@ data = res.json()[<span class="c-str">'data'</span>]
             <span class="method post">POST</span>
             <code>/api/v1/auth/login</code>
           </div>
-          <pre class="code-block"><code><span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> http://localhost:3000/api/v1/auth/login \
+          <pre class="code-block"><code><span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> https://nepal-api-production.up.railway.app/api/v1/auth/login \
   <span class="c-flag">-H</span> <span class="c-str">"Content-Type: application/json"</span> \
   <span class="c-flag">-d</span> <span class="c-str">'{"email":"admin@nepalapi.dev","password":"NepalApi@2024!"}'</span>
 
@@ -703,7 +703,7 @@ data = res.json()[<span class="c-str">'data'</span>]
             <span class="method get">GET</span>
             <code>/api/v1/finance/forex/rates</code>
           </div>
-          <pre class="code-block"><code><span class="c-cmd">curl</span> http://localhost:3000/api/v1/finance/forex/rates
+          <pre class="code-block"><code><span class="c-cmd">curl</span> https://nepal-api-production.up.railway.app/api/v1/finance/forex/rates
 
 <span class="c-comment"># 200 OK — live from Nepal Rastra Bank</span>
 {
@@ -727,7 +727,7 @@ data = res.json()[<span class="c-str">'data'</span>]
             <span class="method post">POST</span>
             <code>/api/v1/tourism/permits/apply</code>
           </div>
-          <pre class="code-block"><code><span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> http://localhost:3000/api/v1/tourism/permits/apply \
+          <pre class="code-block"><code><span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> https://nepal-api-production.up.railway.app/api/v1/tourism/permits/apply \
   <span class="c-flag">-H</span> <span class="c-str">"Content-Type: application/json"</span> \
   <span class="c-flag">-d</span> <span class="c-str">'{"trek_id":"EBC","passport_number":"P123456","nationality":"Foreign"}'</span>
 
@@ -748,7 +748,7 @@ data = res.json()[<span class="c-str">'data'</span>]
             <span class="method get">GET</span>
             <code>/api/v1/jobs/search?category=IT&location=Kathmandu</code>
           </div>
-          <pre class="code-block"><code><span class="c-cmd">curl</span> <span class="c-str">"http://localhost:3000/api/v1/jobs/search?category=IT&location=Kathmandu"</span>
+          <pre class="code-block"><code><span class="c-cmd">curl</span> <span class="c-str">"https://nepal-api-production.up.railway.app/api/v1/jobs/search?category=IT&location=Kathmandu"</span>
 
 <span class="c-comment"># 200 OK</span>
 {
@@ -775,7 +775,7 @@ data = res.json()[<span class="c-str">'data'</span>]
             <span class="method post">POST</span>
             <code>/api/v1/health/triage/analyze</code>
           </div>
-          <pre class="code-block"><code><span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> http://localhost:3000/api/v1/health/triage/analyze \
+          <pre class="code-block"><code><span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> https://nepal-api-production.up.railway.app/api/v1/health/triage/analyze \
   <span class="c-flag">-H</span> <span class="c-str">"Content-Type: application/json"</span> \
   <span class="c-flag">-d</span> <span class="c-str">'{"symptoms":["high_fever","joint_pain","rash"],"patient_age":28}'</span>
 
@@ -794,7 +794,7 @@ data = res.json()[<span class="c-str">'data'</span>]
             <span class="method post">POST</span>
             <code>/api/v1/transport/tickets/book</code>
           </div>
-          <pre class="code-block"><code><span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> http://localhost:3000/api/v1/transport/tickets/book \
+          <pre class="code-block"><code><span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> https://nepal-api-production.up.railway.app/api/v1/transport/tickets/book \
   <span class="c-flag">-H</span> <span class="c-str">"Content-Type: application/json"</span> \
   <span class="c-flag">-d</span> <span class="c-str">'{"route_id":"IC1","passenger_name":"Ram Bahadur","date":"2026-05-01"}'</span>
 
@@ -820,7 +820,7 @@ data = res.json()[<span class="c-str">'data'</span>]
     <h2>Build something for Nepal</h2>
     <p class="cta-sub">10 production-ready APIs, zero signup, no credit card. Hit an endpoint and you're live in seconds.</p>
     <div class="cta-actions">
-      <a href="/docs" target="_blank" class="btn btn-primary btn-lg">Try Free — Open Docs →</a>
+      <a href="https://nepal-api-production.up.railway.app/docs" target="_blank" class="btn btn-primary btn-lg">Try Free — Open Docs →</a>
       <a href="https://github.com/asbinthapa99/Freeapi" target="_blank" class="btn btn-ghost btn-lg">⭐ View Source</a>
     </div>
   </div>
@@ -831,7 +831,8 @@ data = res.json()[<span class="c-str">'data'</span>]
   <div class="section-inner">
     <p class="base-label">Base URL</p>
     <div class="base-url-box">
-      <code id="base-url-text">http://localhost:3000/api/v1</code>
+      <code id="base-url-text">https://nepal-api-production.up.railway.app/api/v1</code>
+
       <button class="copy-btn" onclick="copyBaseUrl()">
         <span id="copy-icon">⎘</span> Copy
       </button>
