@@ -17,6 +17,26 @@ const app = express();
 
 app.set('trust proxy', process.env.TRUST_PROXY === 'true');
 
+const allowedOrigins = (process.env.CORS_ORIGIN || '')
+  .split(',')
+  .map((item) => item.trim())
+  .filter(Boolean);
+
+const vercelPreviewPattern = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i;
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (allowedOrigins.length === 0) return true;
+  if (allowedOrigins.includes(origin)) return true;
+
+  const allowVercelPreviews = process.env.CORS_ALLOW_VERCEL_PREVIEWS !== 'false';
+  if (allowVercelPreviews && vercelPreviewPattern.test(origin)) {
+    return true;
+  }
+
+  return false;
+};
+
 // Landing page
 app.use(express.static(path.join(__dirname, '..', 'landing')));
 
@@ -26,7 +46,13 @@ app.use(helmet({
   contentSecurityPolicy: false
 }));
 app.use(cors({
-  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map((item) => item.trim()) : '*'
+  origin(origin, callback) {
+    if (isAllowedOrigin(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Origin ${origin} is not allowed by CORS`));
+  }
 }));
 app.use(compression());
 app.use(express.json({ limit: '10mb' }));

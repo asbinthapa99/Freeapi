@@ -53,6 +53,16 @@ exports.getForex = async (req, res, next) => {
       return res.json({ status: 'success', source: 'NRB Live API', data: liveData });
     }
 
+    if (liveApi.isStrictLiveMode()) {
+      return res.status(503).json({
+        error: {
+          code: 'UPSTREAM_FOREX_UNAVAILABLE',
+          message: 'Live NRB forex data is currently unavailable.',
+          status: 503
+        }
+      });
+    }
+
     res.json({ status: 'success', source: 'cached/fallback', data: {
       date: date || new Date().toISOString().split('T')[0],
       rates: fallbackRates.map((rate) => ({

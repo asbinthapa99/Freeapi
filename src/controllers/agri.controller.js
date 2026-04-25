@@ -47,10 +47,31 @@ exports.getWeather = async (req, res, next) => {
     const liveApi = require('../services/liveApi.service');
     const { lat, lon } = req.query;
     if (!lat || !lon) return res.status(400).json({ error: { code: 'MISSING_COORDS', message: 'Provide lat and lon.', status: 400 } });
-    
+
+    const openWeatherKey = process.env.OPENWEATHER_API_KEY;
+    if ((!openWeatherKey || openWeatherKey === 'your_openweather_api_key_here') && liveApi.isStrictLiveMode()) {
+      return res.status(503).json({
+        error: {
+          code: 'WEATHER_PROVIDER_NOT_CONFIGURED',
+          message: 'OPENWEATHER_API_KEY must be configured to serve live weather data.',
+          status: 503
+        }
+      });
+    }
+
     const liveWeather = await liveApi.fetchWeather(lat, lon);
     if (liveWeather) {
       return res.json({ status: 'success', source: 'OpenWeatherMap', data: liveWeather });
+    }
+
+    if (liveApi.isStrictLiveMode()) {
+      return res.status(503).json({
+        error: {
+          code: 'UPSTREAM_WEATHER_UNAVAILABLE',
+          message: 'Live weather data is currently unavailable.',
+          status: 503
+        }
+      });
     }
     
     res.json({ status: 'success', source: 'cached', data: { lat, lon, condition: 'Clear', temp_c: 24, humidity: 60 } });

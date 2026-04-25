@@ -99,7 +99,7 @@ curl -X POST https://nepal-api-production.up.railway.app/api/v1/language/transla
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/agri/prices/kalimati` | — | Live Kalimati market prices |
+| GET | `/agri/prices/kalimati` | — | Catalog-backed Kalimati market prices |
 | GET | `/agri/crops/calendar` | — | Planting/harvest calendar |
 | GET | `/agri/weather/forecast` | — | Farm weather forecast |
 | POST | `/agri/disease/analyze` | — | Crop disease diagnosis |
@@ -111,10 +111,10 @@ curl -X POST https://nepal-api-production.up.railway.app/api/v1/language/transla
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/disaster/alerts/active` | — | Active disaster alerts |
-| GET | `/disaster/rivers/levels` | — | River flood levels |
-| GET | `/disaster/earthquakes/recent` | — | Recent earthquake data |
-| GET | `/disaster/landslide/risk-zones` | — | Landslide risk zones |
+| GET | `/disaster/alerts/active` | — | Catalog-backed active disaster alerts |
+| GET | `/disaster/rivers/levels` | — | Catalog-backed river monitoring data |
+| GET | `/disaster/earthquakes/recent` | — | Live USGS earthquake data |
+| GET | `/disaster/landslide/risk-zones` | — | Catalog-backed landslide risk zones |
 | POST | `/disaster/subscribe` | — | Subscribe to SMS alerts |
 
 ---
@@ -186,7 +186,7 @@ curl -X POST https://nepal-api-production.up.railway.app/api/v1/health/triage/an
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/gov/holidays` | — | Public holidays |
+| GET | `/gov/holidays` | — | Catalog-backed public holidays |
 | GET | `/gov/tax/vehicle-rates` | — | Vehicle tax rates |
 | POST | `/gov/documents/verify` | — | Document verification |
 | GET | `/gov/offices/ward` | — | Ward office locator |
@@ -240,6 +240,24 @@ TOKEN=$(curl -s -X POST https://nepal-api-production.up.railway.app/api/v1/auth/
 curl -H "Authorization: Bearer $TOKEN" \
   https://nepal-api-production.up.railway.app/api/v1/auth/users
 ```
+
+---
+
+## Live Data
+
+These endpoints can return real upstream data:
+
+- `/api/v1/finance/forex/rates` from Nepal Rastra Bank
+- `/api/v1/disaster/earthquakes/recent` from USGS
+- `/api/v1/agri/weather/forecast` from OpenWeatherMap
+
+To prevent fake fallback responses in production, set:
+
+```env
+LIVE_DATA_STRICT=true
+```
+
+With strict mode enabled, the API returns `503` when a live provider is unavailable instead of returning simulated data.
 
 ---
 
@@ -325,9 +343,16 @@ Recommended setup:
    `MONGO_URI`
    `MONGO_DB_NAME`
    `CORS_ORIGIN`
+   `CORS_ALLOW_VERCEL_PREVIEWS=true`
 4. Use MongoDB Atlas for persistence.
 5. Point your Vercel frontend to the Render API URL, for example:
    `NEXT_PUBLIC_API_URL=https://your-render-service.onrender.com`
+
+CORS note:
+
+- Set `CORS_ORIGIN` to your production frontend URL, for example `https://freeapi-six.vercel.app`
+- You can provide multiple origins as a comma-separated list
+- `CORS_ALLOW_VERCEL_PREVIEWS=true` also allows Vercel preview deployment origins like `https://your-branch.vercel.app`
 
 Production note:
 

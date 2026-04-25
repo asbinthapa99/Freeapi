@@ -1,4 +1,4 @@
-const BASE = 'https://nepal-api-production.up.railway.app';
+const BASE = window.NEPAL_API_BASE || 'https://nepal-api-production.up.railway.app';
 
 // ── 3D Matrix Code-Rain Canvas ──
 (function () {

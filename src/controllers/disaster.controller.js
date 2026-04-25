@@ -62,6 +62,17 @@ exports.getRecentEarthquakes = async (req, res, next) => {
     if (liveData) {
       return res.json({ status: 'success', source: 'USGS Live API', data: { count: liveData.length, earthquakes: liveData } });
     }
+
+    if (liveApi.isStrictLiveMode()) {
+      return res.status(503).json({
+        error: {
+          code: 'UPSTREAM_EARTHQUAKE_UNAVAILABLE',
+          message: 'Live USGS earthquake data is currently unavailable.',
+          status: 503
+        }
+      });
+    }
+
     res.json({ status: 'success', source: 'cached', data: { count: 0, earthquakes: [], note: 'USGS API unreachable. Showing cached data.' } });
   } catch (error) { next(error); }
 };
