@@ -25,26 +25,37 @@ const elementPoint = (element) => {
 
 const osmName = (tags = {}) => tags.name || tags['name:en'] || tags['name:ne'] || 'Unnamed';
 
+const getOverpassUrls = () => (process.env.OVERPASS_API_URLS || 'https://overpass.kumi.systems/api/interpreter,https://overpass-api.de/api/interpreter')
+  .split(',')
+  .map((url) => url.trim())
+  .filter(Boolean);
+
 const fetchOverpass = async (cacheKey, query, ttl = 3600) => {
   if (!areLiveProvidersEnabled()) return null;
 
   const cached = getCache(cacheKey);
   if (cached) return cached;
 
-  try {
-    const { data } = await axios.get('https://overpass-api.de/api/interpreter', {
-      params: { data: query },
-      timeout: Number(process.env.OVERPASS_TIMEOUT_MS) || 15000,
-      headers: {
-        Accept: 'application/json',
-        'User-Agent': 'NepalAPI/1.0 (https://github.com/asbinthapa99/Freeapi)'
-      }
-    });
+  for (const url of getOverpassUrls()) {
+    try {
+      const { data } = await axios.get(url, {
+        params: { data: query },
+        timeout: Number(process.env.OVERPASS_TIMEOUT_MS) || 12000,
+        headers: {
+          Accept: 'application/json',
+          'User-Agent': 'NepalAPI/1.0 (https://github.com/asbinthapa99/Freeapi)'
+        }
+      });
 
-    return setCache(cacheKey, data.elements || [], ttl);
-  } catch {
-    return null;
+      if (Array.isArray(data.elements)) {
+        return setCache(cacheKey, data.elements, ttl);
+      }
+    } catch {
+      // Try the next public mirror.
+    }
   }
+
+  return null;
 };
 
 // ── NRB Forex (Nepal Rastra Bank) ──
