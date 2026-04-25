@@ -1,18 +1,22 @@
 // KrishiData API Controller - Agriculture
 const kalimatiPrices = require('../data/kalimatiPrices');
 const { getDataset } = require('../services/catalog.service');
+const liveApi = require('../services/liveApi.service');
 
 exports.getPrices = async (req, res, next) => {
   try {
     const { date, commodity } = req.query;
-    let prices = await getDataset('agri_kalimati_prices', kalimatiPrices);
-    
+
+    const liveData = await liveApi.fetchKalimati();
+    let prices = liveData || await getDataset('agri_kalimati_prices', kalimatiPrices);
+    const source = liveData ? 'Kalimati Market Live' : 'Kalimati Market (cached)';
+
     if (commodity) {
-      prices = prices.filter(p => p.commodity.toLowerCase().includes(commodity.toLowerCase()) || 
+      prices = prices.filter(p => p.commodity.toLowerCase().includes(commodity.toLowerCase()) ||
                                   (p.commodity_ne && p.commodity_ne.includes(commodity)));
     }
-    
-    res.json({ status: 'success', data: { source: 'Kalimati Market', date: date || new Date().toISOString().split('T')[0], count: prices.length, prices } });
+
+    res.json({ status: 'success', data: { source, date: date || new Date().toISOString().split('T')[0], count: prices.length, prices } });
   } catch (error) { next(error); }
 };
 
@@ -44,24 +48,12 @@ exports.analyzeDisease = async (req, res, next) => {
 
 exports.getWeather = async (req, res, next) => {
   try {
-    const liveApi = require('../services/liveApi.service');
     const { lat, lon } = req.query;
     if (!lat || !lon) return res.status(400).json({ error: { code: 'MISSING_COORDS', message: 'Provide lat and lon.', status: 400 } });
 
-    const openWeatherKey = process.env.OPENWEATHER_API_KEY;
-    if ((!openWeatherKey || openWeatherKey === 'your_openweather_api_key_here') && liveApi.isStrictLiveMode()) {
-      return res.status(503).json({
-        error: {
-          code: 'WEATHER_PROVIDER_NOT_CONFIGURED',
-          message: 'OPENWEATHER_API_KEY must be configured to serve live weather data.',
-          status: 503
-        }
-      });
-    }
-
-    const liveWeather = await liveApi.fetchWeather(lat, lon);
+    const liveWeather = await liveApi.fetchWeather(parseFloat(lat), parseFloat(lon));
     if (liveWeather) {
-      return res.json({ status: 'success', source: 'OpenWeatherMap', data: liveWeather });
+      return res.json({ status: 'success', source: 'Open-Meteo', data: liveWeather });
     }
 
     if (liveApi.isStrictLiveMode()) {

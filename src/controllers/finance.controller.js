@@ -32,10 +32,10 @@ const categorizeExpense = (description) => {
 
 const getNormalizedForexPayload = async (date) => {
   const liveData = await liveApi.fetchForex(date);
-  if (liveData && liveData.payload && liveData.payload.length > 0) {
+  if (Array.isArray(liveData) && liveData.length > 0) {
     return {
-      date: liveData.payload[0].date || date || new Date().toISOString().split('T')[0],
-      rates: liveData.payload[0].rates
+      date: liveData[0].date || date || new Date().toISOString().split('T')[0],
+      rates: liveData[0].rates
     };
   }
 
@@ -49,8 +49,8 @@ exports.getForex = async (req, res, next) => {
   try {
     const { date } = req.query; // format: YYYY-MM-DD
     const liveData = await liveApi.fetchForex(date);
-    if (liveData && liveData.payload && liveData.payload.length > 0) {
-      return res.json({ status: 'success', source: 'NRB Live API', data: liveData });
+    if (Array.isArray(liveData) && liveData.length > 0) {
+      return res.json({ status: 'success', source: 'NRB Live API', data: { payload: liveData } });
     }
 
     if (liveApi.isStrictLiveMode()) {
