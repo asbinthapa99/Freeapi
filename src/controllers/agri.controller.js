@@ -8,6 +8,16 @@ exports.getPrices = async (req, res, next) => {
     const { date, commodity } = req.query;
 
     const liveData = await liveApi.fetchKalimati();
+    if (!liveData && liveApi.isStrictLiveMode()) {
+      return res.status(503).json({
+        error: {
+          code: 'UPSTREAM_KALIMATI_UNAVAILABLE',
+          message: 'Live Kalimati market data is currently unavailable.',
+          status: 503
+        }
+      });
+    }
+
     let prices = liveData || await getDataset('agri_kalimati_prices', kalimatiPrices);
     const source = liveData ? 'Kalimati Market Live' : 'Kalimati Market (cached)';
 

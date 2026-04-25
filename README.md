@@ -245,19 +245,36 @@ curl -H "Authorization: Bearer $TOKEN" \
 
 ## Live Data
 
-These endpoints can return real upstream data:
+These routes now use free live providers where public data exists:
 
 - `/api/v1/finance/forex/rates` from Nepal Rastra Bank
+- `/api/v1/finance/inflation` from World Bank
+- `/api/v1/finance/banks/branches` from OpenStreetMap
 - `/api/v1/disaster/earthquakes/recent` from USGS
-- `/api/v1/agri/weather/forecast` from OpenWeatherMap
+- `/api/v1/agri/weather/forecast` from Open-Meteo, with OpenWeatherMap as optional fallback
+- `/api/v1/agri/prices/kalimati` from the Kalimati market portal when reachable
+- `/api/v1/health/facilities/nearby` from OpenStreetMap
+- `/api/v1/gov/offices/ward` from OpenStreetMap
+- `/api/v1/tourism/treks/routes` from OpenStreetMap hiking/tourism data
+- `/api/v1/tourism/teahouses/availability` from OpenStreetMap lodging data
+- `/api/v1/transport/routes/search` from OpenStreetMap public transport data
 
 To prevent fake fallback responses in production, set:
 
 ```env
 LIVE_DATA_STRICT=true
+LIVE_PROVIDERS_DISABLED=false
 ```
 
 With strict mode enabled, the API returns `503` when a live provider is unavailable instead of returning simulated data.
+
+Some workflows still need private/operator providers for true real-time data:
+
+- live bus GPS
+- live seat inventory
+- permit status from official permit systems
+- private job-board feeds
+- real payment status without configured payment provider keys
 
 ---
 

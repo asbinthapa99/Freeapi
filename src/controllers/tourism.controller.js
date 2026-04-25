@@ -3,24 +3,47 @@ const { v4: uuidv4 } = require('uuid');
 const tourismData = require('../data/tourismData');
 const { appendRecord, findRecordByField } = require('../services/persistence.service');
 const { getDataset } = require('../services/catalog.service');
+const liveApi = require('../services/liveApi.service');
 
 exports.getTrekkingRoutes = async (req, res, next) => {
   try {
     const { region, difficulty } = req.query;
-    let treks = await getDataset('tourism_treks', tourismData.treks);
-    if (region) treks = treks.filter(t => t.region.toLowerCase() === region.toLowerCase());
-    if (difficulty) treks = treks.filter(t => t.difficulty.toLowerCase() === difficulty.toLowerCase());
-    res.json({ status: 'success', data: { count: treks.length, treks } });
+    const liveTreks = await liveApi.fetchTourismRoutes({ region, limit: 75 });
+    if (!liveTreks && liveApi.isStrictLiveMode()) {
+      return res.status(503).json({
+        error: {
+          code: 'UPSTREAM_TOURISM_ROUTES_UNAVAILABLE',
+          message: 'Live OpenStreetMap tourism route data is currently unavailable.',
+          status: 503
+        }
+      });
+    }
+
+    let treks = liveTreks || await getDataset('tourism_treks', tourismData.treks);
+    if (!liveTreks && region) treks = treks.filter(t => t.region.toLowerCase() === region.toLowerCase());
+    if (!liveTreks && difficulty) treks = treks.filter(t => t.difficulty.toLowerCase() === difficulty.toLowerCase());
+    res.json({ status: 'success', source: liveTreks ? 'OpenStreetMap' : 'catalog', data: { count: treks.length, treks } });
   } catch (error) { next(error); }
 };
 
 exports.getTeahouses = async (req, res, next) => {
   try {
     const { location, max_price } = req.query;
-    let teahouses = await getDataset('tourism_teahouses', tourismData.teahouses);
-    if (location) teahouses = teahouses.filter(t => t.location.toLowerCase() === location.toLowerCase());
-    if (max_price) teahouses = teahouses.filter(t => t.price_per_night_npr <= Number(max_price));
-    res.json({ status: 'success', data: { count: teahouses.length, teahouses } });
+    const liveTeahouses = await liveApi.fetchTourismPlaces({ location, limit: 75 });
+    if (!liveTeahouses && liveApi.isStrictLiveMode()) {
+      return res.status(503).json({
+        error: {
+          code: 'UPSTREAM_TOURISM_PLACES_UNAVAILABLE',
+          message: 'Live OpenStreetMap lodging data is currently unavailable.',
+          status: 503
+        }
+      });
+    }
+
+    let teahouses = liveTeahouses || await getDataset('tourism_teahouses', tourismData.teahouses);
+    if (!liveTeahouses && location) teahouses = teahouses.filter(t => t.location.toLowerCase() === location.toLowerCase());
+    if (!liveTeahouses && max_price) teahouses = teahouses.filter(t => t.price_per_night_npr <= Number(max_price));
+    res.json({ status: 'success', source: liveTeahouses ? 'OpenStreetMap' : 'catalog', data: { count: teahouses.length, teahouses } });
   } catch (error) { next(error); }
 };
 

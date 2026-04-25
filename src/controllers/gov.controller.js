@@ -3,6 +3,7 @@ const govDisasterData = require('../data/govDisasterData');
 const holidaysFallback = require('../data/holidays');
 const { getDataset } = require('../services/catalog.service');
 const verificationService = require('../services/verification.service');
+const liveApi = require('../services/liveApi.service');
 
 exports.trackApplication = async (req, res, next) => {
   try {
@@ -21,12 +22,23 @@ exports.trackApplication = async (req, res, next) => {
 exports.getWardInfo = async (req, res, next) => {
   try {
     const { ward, municipality } = req.query;
-    let offices = await getDataset('gov_ward_offices', govDisasterData.wardOffices);
+    const liveOffices = await liveApi.fetchGovernmentOffices({ ward, municipality, limit: 75 });
+    if (!liveOffices && liveApi.isStrictLiveMode()) {
+      return res.status(503).json({
+        error: {
+          code: 'UPSTREAM_GOV_OFFICES_UNAVAILABLE',
+          message: 'Live OpenStreetMap government office data is currently unavailable.',
+          status: 503
+        }
+      });
+    }
+
+    let offices = liveOffices || await getDataset('gov_ward_offices', govDisasterData.wardOffices);
     
-    if (ward) offices = offices.filter(o => o.ward === parseInt(ward, 10));
-    if (municipality) offices = offices.filter(o => o.municipality.toLowerCase().includes(municipality.toLowerCase()));
+    if (!liveOffices && ward) offices = offices.filter(o => o.ward === parseInt(ward, 10));
+    if (!liveOffices && municipality) offices = offices.filter(o => o.municipality.toLowerCase().includes(municipality.toLowerCase()));
     
-    res.json({ status: 'success', data: { count: offices.length, offices } });
+    res.json({ status: 'success', source: liveOffices ? 'OpenStreetMap' : 'catalog', data: { count: offices.length, offices } });
   } catch (error) { next(error); }
 };
 

@@ -3,9 +3,52 @@ const NodeCache = require('node-cache');
 const cache = new NodeCache({ stdTTL: 600 });
 
 const isStrictLiveMode = () => process.env.LIVE_DATA_STRICT === 'true';
+const areLiveProvidersEnabled = () => process.env.NODE_ENV !== 'test' && process.env.LIVE_PROVIDERS_DISABLED !== 'true';
+const defaultTimeout = () => Number(process.env.LIVE_PROVIDER_TIMEOUT_MS) || 8000;
+
+const getCache = (key) => cache.get(key);
+const setCache = (key, value, ttl = 600) => {
+  cache.set(key, value, ttl);
+  return value;
+};
+
+const normalizeText = (value = '') => String(value).toLowerCase().trim();
+
+const elementPoint = (element) => {
+  const lat = element.lat || element.center?.lat;
+  const lon = element.lon || element.center?.lon;
+  if (lat === undefined || lon === undefined) return null;
+  return { lat: Number(lat), lon: Number(lon) };
+};
+
+const osmName = (tags = {}) => tags.name || tags['name:en'] || tags['name:ne'] || 'Unnamed';
+
+const fetchOverpass = async (cacheKey, query, ttl = 3600) => {
+  if (!areLiveProvidersEnabled()) return null;
+
+  const cached = getCache(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const { data } = await axios.get('https://overpass-api.de/api/interpreter', {
+      params: { data: query },
+      timeout: Number(process.env.OVERPASS_TIMEOUT_MS) || 15000,
+      headers: {
+        Accept: 'application/json',
+        'User-Agent': 'NepalAPI/1.0 (https://github.com/asbinthapa99/Freeapi)'
+      }
+    });
+
+    return setCache(cacheKey, data.elements || [], ttl);
+  } catch {
+    return null;
+  }
+};
 
 // ── NRB Forex (Nepal Rastra Bank) ──
 exports.fetchNRBForex = async (requestedDate) => {
+  if (!areLiveProvidersEnabled()) return null;
+
   const cacheKey = `nrb_forex:${requestedDate || 'latest'}`;
   const cached = cache.get(cacheKey);
   if (cached) return cached;
@@ -34,6 +77,8 @@ exports.fetchForex = exports.fetchNRBForex;
 
 // ── USGS Earthquakes (Nepal region, real-time) ──
 exports.fetchEarthquakes = async () => {
+  if (!areLiveProvidersEnabled()) return null;
+
   const cached = cache.get('earthquakes');
   if (cached) return cached;
   try {
@@ -68,6 +113,8 @@ exports.fetchEarthquakes = async () => {
 
 // ── Open-Meteo Weather (free, no API key needed) ──
 exports.fetchWeather = async (lat = 27.7172, lon = 85.324) => {
+  if (!areLiveProvidersEnabled()) return null;
+
   const cacheKey = `weather:${lat}:${lon}`;
   const cached = cache.get(cacheKey);
   if (cached) return cached;
@@ -118,8 +165,238 @@ exports.fetchWeather = async (lat = 27.7172, lon = 85.324) => {
   }
 };
 
+exports.fetchHealthFacilities = async ({ district, type, limit = 50 } = {}) => {
+  const cacheKey = `osm:health:${district || 'all'}:${type || 'all'}:${limit}`;
+  const query = `
+    [out:json][timeout:25];
+    area["ISO3166-1"="NP"][admin_level=2]->.np;
+    (
+      nwr["amenity"~"^(hospital|clinic|doctors|pharmacy|dentist)$"](area.np);
+      nwr["healthcare"](area.np);
+    );
+    out center tags ${Number(limit)};
+  `;
+  const elements = await fetchOverpass(cacheKey, query);
+  if (!elements) return null;
+
+  const districtFilter = normalizeText(district);
+  const typeFilter = normalizeText(type);
+  return elements
+    .map((element) => {
+      const tags = element.tags || {};
+      return {
+        source: 'OpenStreetMap',
+        osm_id: `${element.type}/${element.id}`,
+        name: osmName(tags),
+        type: tags.healthcare || tags.amenity || 'healthcare',
+        district: tags['addr:district'] || tags.district || null,
+        municipality: tags['addr:city'] || tags['addr:municipality'] || null,
+        phone: tags.phone || tags['contact:phone'] || null,
+        coordinates: elementPoint(element)
+      };
+    })
+    .filter((item) => !districtFilter || normalizeText(item.district || item.municipality || item.name).includes(districtFilter))
+    .filter((item) => !typeFilter || normalizeText(item.type).includes(typeFilter));
+};
+
+exports.fetchBankBranches = async ({ district, bank, limit = 50 } = {}) => {
+  const cacheKey = `osm:banks:${district || 'all'}:${bank || 'all'}:${limit}`;
+  const query = `
+    [out:json][timeout:25];
+    area["ISO3166-1"="NP"][admin_level=2]->.np;
+    (
+      nwr["amenity"="bank"](area.np);
+      nwr["office"~"^(financial|bank)$"](area.np);
+    );
+    out center tags ${Number(limit)};
+  `;
+  const elements = await fetchOverpass(cacheKey, query);
+  if (!elements) return null;
+
+  const districtFilter = normalizeText(district);
+  const bankFilter = normalizeText(bank);
+  return elements
+    .map((element) => {
+      const tags = element.tags || {};
+      return {
+        source: 'OpenStreetMap',
+        osm_id: `${element.type}/${element.id}`,
+        bank: osmName(tags),
+        district: tags['addr:district'] || tags['addr:city'] || tags['addr:municipality'] || null,
+        branch: tags.branch || osmName(tags),
+        phone: tags.phone || tags['contact:phone'] || null,
+        coordinates: elementPoint(element)
+      };
+    })
+    .filter((item) => !districtFilter || normalizeText(`${item.district || ''} ${item.bank}`).includes(districtFilter))
+    .filter((item) => !bankFilter || normalizeText(item.bank).includes(bankFilter));
+};
+
+exports.fetchGovernmentOffices = async ({ municipality, ward, limit = 50 } = {}) => {
+  const cacheKey = `osm:gov:${municipality || 'all'}:${ward || 'all'}:${limit}`;
+  const query = `
+    [out:json][timeout:25];
+    area["ISO3166-1"="NP"][admin_level=2]->.np;
+    (
+      nwr["office"="government"](area.np);
+      nwr["amenity"="townhall"](area.np);
+      nwr["name"~"Ward|Municipality|Rural Municipality|पालिका|वडा", i](area.np);
+    );
+    out center tags ${Number(limit)};
+  `;
+  const elements = await fetchOverpass(cacheKey, query);
+  if (!elements) return null;
+
+  const municipalityFilter = normalizeText(municipality);
+  const wardFilter = ward ? String(ward) : '';
+  return elements
+    .map((element) => {
+      const tags = element.tags || {};
+      return {
+        source: 'OpenStreetMap',
+        osm_id: `${element.type}/${element.id}`,
+        name: osmName(tags),
+        office_type: tags.office || tags.amenity || 'government',
+        municipality: tags['addr:city'] || tags['addr:municipality'] || null,
+        ward: tags['addr:ward'] || tags.ward || null,
+        phone: tags.phone || tags['contact:phone'] || null,
+        coordinates: elementPoint(element)
+      };
+    })
+    .filter((item) => !municipalityFilter || normalizeText(`${item.municipality || ''} ${item.name}`).includes(municipalityFilter))
+    .filter((item) => !wardFilter || String(item.ward || item.name).includes(wardFilter));
+};
+
+exports.fetchTourismRoutes = async ({ region, limit = 50 } = {}) => {
+  const cacheKey = `osm:tourism-routes:${region || 'all'}:${limit}`;
+  const query = `
+    [out:json][timeout:25];
+    area["ISO3166-1"="NP"][admin_level=2]->.np;
+    (
+      relation["route"~"^(hiking|foot)$"](area.np);
+      nwr["tourism"~"^(attraction|viewpoint)$"](area.np);
+    );
+    out center tags ${Number(limit)};
+  `;
+  const elements = await fetchOverpass(cacheKey, query);
+  if (!elements) return null;
+
+  const regionFilter = normalizeText(region);
+  return elements
+    .map((element) => {
+      const tags = element.tags || {};
+      return {
+        source: 'OpenStreetMap',
+        osm_id: `${element.type}/${element.id}`,
+        name: osmName(tags),
+        route_type: tags.route || tags.tourism || 'tourism',
+        distance: tags.distance || null,
+        network: tags.network || null,
+        region: tags.region || tags['addr:region'] || null,
+        coordinates: elementPoint(element)
+      };
+    })
+    .filter((item) => !regionFilter || normalizeText(`${item.region || ''} ${item.name}`).includes(regionFilter));
+};
+
+exports.fetchTourismPlaces = async ({ location, limit = 50 } = {}) => {
+  const cacheKey = `osm:tourism-places:${location || 'all'}:${limit}`;
+  const query = `
+    [out:json][timeout:25];
+    area["ISO3166-1"="NP"][admin_level=2]->.np;
+    (
+      nwr["tourism"~"^(guest_house|hotel|hostel|alpine_hut|camp_site)$"](area.np);
+    );
+    out center tags ${Number(limit)};
+  `;
+  const elements = await fetchOverpass(cacheKey, query);
+  if (!elements) return null;
+
+  const locationFilter = normalizeText(location);
+  return elements
+    .map((element) => {
+      const tags = element.tags || {};
+      return {
+        source: 'OpenStreetMap',
+        osm_id: `${element.type}/${element.id}`,
+        name: osmName(tags),
+        type: tags.tourism,
+        location: tags['addr:city'] || tags['addr:place'] || tags.place || null,
+        phone: tags.phone || tags['contact:phone'] || null,
+        website: tags.website || tags['contact:website'] || null,
+        coordinates: elementPoint(element)
+      };
+    })
+    .filter((item) => !locationFilter || normalizeText(`${item.location || ''} ${item.name}`).includes(locationFilter));
+};
+
+exports.fetchTransportRoutes = async ({ start, end, limit = 50 } = {}) => {
+  const cacheKey = `osm:transport:${start || 'all'}:${end || 'all'}:${limit}`;
+  const query = `
+    [out:json][timeout:25];
+    area["ISO3166-1"="NP"][admin_level=2]->.np;
+    (
+      relation["route"~"^(bus|trolleybus)$"](area.np);
+      nwr["highway"="bus_stop"](area.np);
+      nwr["public_transport"~"^(stop_position|platform)$"](area.np);
+    );
+    out center tags ${Number(limit)};
+  `;
+  const elements = await fetchOverpass(cacheKey, query);
+  if (!elements) return null;
+
+  const startFilter = normalizeText(start);
+  const endFilter = normalizeText(end);
+  return elements
+    .map((element) => {
+      const tags = element.tags || {};
+      return {
+        source: 'OpenStreetMap',
+        osm_id: `${element.type}/${element.id}`,
+        name: osmName(tags),
+        route: tags.route || tags.highway || tags.public_transport || 'public_transport',
+        from: tags.from || null,
+        to: tags.to || null,
+        operator: tags.operator || null,
+        coordinates: elementPoint(element)
+      };
+    })
+    .filter((item) => !startFilter || normalizeText(`${item.from || ''} ${item.name}`).includes(startFilter))
+    .filter((item) => !endFilter || normalizeText(`${item.to || ''} ${item.name}`).includes(endFilter));
+};
+
+exports.fetchWorldBankIndicator = async (indicator, { perPage = 5 } = {}) => {
+  if (!areLiveProvidersEnabled()) return null;
+
+  const cacheKey = `worldbank:np:${indicator}:${perPage}`;
+  const cached = getCache(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const { data } = await axios.get(`https://api.worldbank.org/v2/country/NP/indicator/${indicator}`, {
+      params: { format: 'json', per_page: perPage, mrnev: 1 },
+      timeout: defaultTimeout()
+    });
+    const rows = Array.isArray(data) ? data[1] || [] : [];
+    const result = rows
+      .filter((row) => row.value !== null && row.value !== undefined)
+      .map((row) => ({
+        indicator: row.indicator?.value || indicator,
+        date: row.date,
+        value: row.value,
+        unit: row.unit || null,
+        source: 'World Bank'
+      }));
+    return setCache(cacheKey, result, 21600);
+  } catch {
+    return null;
+  }
+};
+
 // ── Kalimati Market Prices (Government portal) ──
 exports.fetchKalimati = async () => {
+  if (!areLiveProvidersEnabled()) return null;
+
   const cached = cache.get('kalimati');
   if (cached) return cached;
   try {
@@ -156,6 +433,7 @@ exports.fetchKalimati = async () => {
 };
 
 exports.isStrictLiveMode = isStrictLiveMode;
+exports.areLiveProvidersEnabled = areLiveProvidersEnabled;
 
 function weatherCodeToCondition(code) {
   if (code === 0) return 'Clear';

@@ -1,6 +1,7 @@
 // SwasthyaTriage API Controller - Health Symptom Checker
 const healthData = require('../data/healthData');
 const { getDataset } = require('../services/catalog.service');
+const liveApi = require('../services/liveApi.service');
 
 const VALID_SYMPTOMS = ['high_fever','joint_pain','rash','headache','body_ache','diarrhea','vomiting','dehydration','cough','fever','breathing_difficulty','chills','sweating','itchy_eyes','sneezing','runny_nose','stomach_pain','nausea','bloating'];
 
@@ -39,10 +40,21 @@ exports.analyzeTriage = async (req, res, next) => {
 exports.getNearbyFacilities = async (req, res, next) => {
   try {
     const { district, type } = req.query;
-    let facilities = await getDataset('health_facilities', healthData.healthFacilities);
-    if (district) facilities = facilities.filter(f => f.district.toLowerCase() === district.toLowerCase());
-    if (type) facilities = facilities.filter(f => f.type.toLowerCase() === type.toLowerCase());
-    res.json({ status: 'success', data: { count: facilities.length, facilities } });
+    const liveFacilities = await liveApi.fetchHealthFacilities({ district, type, limit: 75 });
+    if (!liveFacilities && liveApi.isStrictLiveMode()) {
+      return res.status(503).json({
+        error: {
+          code: 'UPSTREAM_HEALTH_FACILITIES_UNAVAILABLE',
+          message: 'Live OpenStreetMap health facility data is currently unavailable.',
+          status: 503
+        }
+      });
+    }
+
+    let facilities = liveFacilities || await getDataset('health_facilities', healthData.healthFacilities);
+    if (!liveFacilities && district) facilities = facilities.filter(f => f.district.toLowerCase() === district.toLowerCase());
+    if (!liveFacilities && type) facilities = facilities.filter(f => f.type.toLowerCase() === type.toLowerCase());
+    res.json({ status: 'success', source: liveFacilities ? 'OpenStreetMap' : 'catalog', data: { count: facilities.length, facilities } });
   } catch (error) { next(error); }
 };
 

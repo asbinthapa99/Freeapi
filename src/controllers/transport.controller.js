@@ -3,16 +3,28 @@ const { v4: uuidv4 } = require('uuid');
 const transportData = require('../data/transportData');
 const { appendRecord } = require('../services/persistence.service');
 const { getDataset } = require('../services/catalog.service');
+const liveApi = require('../services/liveApi.service');
 
 exports.getRoutes = async (req, res, next) => {
   try {
     const { start, end } = req.query;
-    let routes = await getDataset('transport_routes', transportData.routes);
+    const liveRoutes = await liveApi.fetchTransportRoutes({ start, end, limit: 75 });
+    if (!liveRoutes && liveApi.isStrictLiveMode()) {
+      return res.status(503).json({
+        error: {
+          code: 'UPSTREAM_TRANSPORT_ROUTES_UNAVAILABLE',
+          message: 'Live OpenStreetMap transport route data is currently unavailable.',
+          status: 503
+        }
+      });
+    }
+
+    let routes = liveRoutes || await getDataset('transport_routes', transportData.routes);
     
-    if (start) routes = routes.filter(r => r.stops.some(s => s.toLowerCase() === start.toLowerCase()));
-    if (end) routes = routes.filter(r => r.stops.some(s => s.toLowerCase() === end.toLowerCase()));
+    if (!liveRoutes && start) routes = routes.filter(r => r.stops.some(s => s.toLowerCase() === start.toLowerCase()));
+    if (!liveRoutes && end) routes = routes.filter(r => r.stops.some(s => s.toLowerCase() === end.toLowerCase()));
     // If both start and end, filter strictly where start comes before end (simplified logic)
-    if (start && end) {
+    if (!liveRoutes && start && end) {
       routes = routes.filter(r => {
         const i1 = r.stops.findIndex(s => s.toLowerCase() === start.toLowerCase());
         const i2 = r.stops.findIndex(s => s.toLowerCase() === end.toLowerCase());
@@ -20,7 +32,7 @@ exports.getRoutes = async (req, res, next) => {
       });
     }
     
-    res.json({ status: 'success', data: { count: routes.length, routes } });
+    res.json({ status: 'success', source: liveRoutes ? 'OpenStreetMap' : 'catalog', data: { count: routes.length, routes } });
   } catch (error) { next(error); }
 };
 
@@ -84,6 +96,16 @@ exports.searchRoutes = exports.getRoutes;
 exports.getBusLocation = async (req, res, next) => {
   try {
     const { bus_id } = req.params;
+    if (liveApi.isStrictLiveMode()) {
+      return res.status(503).json({
+        error: {
+          code: 'LIVE_BUS_GPS_UNAVAILABLE',
+          message: 'Live bus GPS requires a transport operator provider and is not available from free public data.',
+          status: 503
+        }
+      });
+    }
+
     const routes = await getDataset('transport_routes', transportData.routes);
     const route = routes.find((item) => item.id === bus_id.toUpperCase());
     if (!route) {
@@ -107,6 +129,16 @@ exports.getBusLocation = async (req, res, next) => {
 exports.getSeats = async (req, res, next) => {
   try {
     const { trip_id } = req.params;
+    if (liveApi.isStrictLiveMode()) {
+      return res.status(503).json({
+        error: {
+          code: 'LIVE_SEAT_INVENTORY_UNAVAILABLE',
+          message: 'Live seat inventory requires an operator booking provider and is not available from free public data.',
+          status: 503
+        }
+      });
+    }
+
     const intercityRoutes = await getDataset('transport_intercity_routes', transportData.intercityRoutes);
     const route = intercityRoutes.find((item) => item.id === trip_id.toUpperCase());
     if (!route) {

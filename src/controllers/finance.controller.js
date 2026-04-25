@@ -102,7 +102,29 @@ exports.calculateRemittance = async (req, res, next) => {
 
 exports.getInflation = async (req, res, next) => {
   try {
-    // Simulated historical data, as NRB inflation data often requires complex parsing or PDFs
+    const inflation = await liveApi.fetchWorldBankIndicator('FP.CPI.TOTL.ZG');
+    if (inflation && inflation.length > 0) {
+      return res.json({
+        status: 'success',
+        source: 'World Bank Live API',
+        data: {
+          country: 'Nepal',
+          indicator: 'Inflation, consumer prices (annual %)',
+          observations: inflation
+        }
+      });
+    }
+
+    if (liveApi.isStrictLiveMode()) {
+      return res.status(503).json({
+        error: {
+          code: 'UPSTREAM_INFLATION_UNAVAILABLE',
+          message: 'Live World Bank inflation data is currently unavailable.',
+          status: 503
+        }
+      });
+    }
+
     res.json({ status: 'success', data: {
       period: '2024-2025',
       inflation_rate_percent: 6.5,
@@ -174,14 +196,27 @@ exports.initiatePayment = async (req, res, next) => {
 
 exports.getBankBranches = async (req, res, next) => {
   try {
-    const bankBranches = await getDataset('finance_bank_branches', bankBranchesFallback);
     const { bank, district } = req.query;
+    const liveBranches = await liveApi.fetchBankBranches({ bank, district, limit: 75 });
+    const bankBranches = liveBranches
+      ? liveBranches
+      : await getDataset('finance_bank_branches', bankBranchesFallback);
     let branches = bankBranches;
 
     if (bank) branches = branches.filter((item) => item.bank.toLowerCase().includes(bank.toLowerCase()));
-    if (district) branches = branches.filter((item) => item.district.toLowerCase() === district.toLowerCase());
+    if (district) branches = branches.filter((item) => item.district && item.district.toLowerCase().includes(district.toLowerCase()));
 
-    res.json({ status: 'success', data: { count: branches.length, branches } });
+    if (liveApi.isStrictLiveMode() && !liveBranches) {
+      return res.status(503).json({
+        error: {
+          code: 'UPSTREAM_BANK_BRANCHES_UNAVAILABLE',
+          message: 'Live OpenStreetMap bank branch data is currently unavailable.',
+          status: 503
+        }
+      });
+    }
+
+    res.json({ status: 'success', source: liveBranches ? 'OpenStreetMap' : 'catalog', data: { count: branches.length, branches } });
   } catch (error) { next(error); }
 };
 
