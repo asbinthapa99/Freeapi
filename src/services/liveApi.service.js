@@ -66,19 +66,23 @@ exports.fetchNRBForex = async (requestedDate) => {
   const cached = cache.get(cacheKey);
   if (cached) return cached;
   try {
-    const now = new Date();
-    const from = `${now.getUTCFullYear()}-01-01`;
-    const to   = `${now.getUTCFullYear()}-12-31`;
+    const toDate = requestedDate ? new Date(requestedDate) : new Date();
+    const fromDate = requestedDate
+      ? new Date(requestedDate)
+      : new Date(toDate.getTime() - (10 * 24 * 60 * 60 * 1000));
+    const to = toDate.toISOString().slice(0, 10);
+    const from = fromDate.toISOString().slice(0, 10);
     const { data } = await axios.get('https://www.nrb.org.np/api/forex/v1/rates', {
-      params: { page: 1, per_page: 5, from, to },
+      params: { page: 1, per_page: requestedDate ? 1 : 15, from, to },
       timeout: 8000,
       headers: { 'Accept': 'application/json' }
     });
     // NRB returns { status:{code:200}, data:{ payload:[{date, rates:[]}] } }
     const payload = data?.data?.payload;
     if (payload && payload.length > 0) {
-      cache.set(cacheKey, payload);
-      return payload;
+      const newestFirst = [...payload].sort((a, b) => new Date(b.date) - new Date(a.date));
+      cache.set(cacheKey, newestFirst);
+      return newestFirst;
     }
     return null;
   } catch {

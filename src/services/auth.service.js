@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('crypto');
 const { readCollection, writeCollection } = require('./persistence.service');
 const { DEFAULT_ROLE, ROLE_PERMISSIONS, expandPermissions } = require('../config/rbac');
 

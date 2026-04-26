@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('crypto');
 
 const CHANNEL_CONFIG = {
   CARD: { fee_percent: 2.5, settlement: 'T+1' },
@@ -7,6 +7,10 @@ const CHANNEL_CONFIG = {
   ESEWA: { fee_percent: 1.2, settlement: 'instant' },
   CONNECT_IPS: { fee_percent: 0.5, settlement: 'same_day' }
 };
+
+const isFallbackPaymentAllowed = () => (
+  process.env.NODE_ENV !== 'production' || process.env.PAYMENT_PROVIDER_REQUIRED === 'false'
+);
 
 const createStripePaymentIntent = async ({ amount, currency, reference, requestId }) => {
   if (!process.env.STRIPE_SECRET_KEY) {
@@ -105,6 +109,13 @@ const createPayment = async ({ channel, amount, currency, reference, requestId }
       integration_mode: 'live',
       ...providerPayload
     };
+  }
+
+  if (!isFallbackPaymentAllowed()) {
+    const error = new Error(`Payment provider is not configured for ${normalizedChannel}.`);
+    error.status = 503;
+    error.code = 'PAYMENT_PROVIDER_UNAVAILABLE';
+    throw error;
   }
 
   return {

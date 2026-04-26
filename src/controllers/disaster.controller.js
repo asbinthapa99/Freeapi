@@ -1,5 +1,5 @@
 // NepalAlert API Controller - Disaster & Weather Alerts
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('crypto');
 const govDisasterData = require('../data/govDisasterData');
 const liveApi = require('../services/liveApi.service');
 const { appendRecord } = require('../services/persistence.service');

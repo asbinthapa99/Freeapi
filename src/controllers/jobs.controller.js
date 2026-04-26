@@ -1,5 +1,5 @@
 // RozgariMatch API Controller - Jobs
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('crypto');
 const jobsData = require('../data/jobsData');
 const { appendRecord, readCollection } = require('../services/persistence.service');
 const { getDataset } = require('../services/catalog.service');

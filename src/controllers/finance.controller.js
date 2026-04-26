@@ -1,5 +1,5 @@
 // PaisaLink API Controller - Finance
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('crypto');
 const liveApi = require('../services/liveApi.service');
 const { appendRecord } = require('../services/persistence.service');
 const { getDataset } = require('../services/catalog.service');

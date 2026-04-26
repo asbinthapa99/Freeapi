@@ -1,5 +1,5 @@
 // YatraTech API Controller - Tourism
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('crypto');
 const tourismData = require('../data/tourismData');
 const { appendRecord, findRecordByField } = require('../services/persistence.service');
 const { getDataset } = require('../services/catalog.service');

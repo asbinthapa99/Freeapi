@@ -2,7 +2,7 @@ services:
   - type: web
     name: nepal-api
     runtime: node
-    buildCommand: npm install
+    buildCommand: npm ci --omit=dev
     startCommand: npm start
     envVars:
       - key: NODE_ENV

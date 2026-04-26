@@ -4,6 +4,19 @@ const { getMongoDb, isMongoConnected } = require('./db.service');
 
 const STORAGE_DIR = process.env.PERSISTENCE_DIR || path.join(process.cwd(), '.runtime-store');
 const writeQueues = new Map();
+const fileFallbackCollections = new Set();
+
+const shouldUseFileFallback = () => (
+  process.env.NODE_ENV !== 'production' || process.env.MONGO_REQUIRED !== 'true'
+);
+
+const createPersistenceError = (collection, operation, error) => {
+  const persistenceError = new Error(`MongoDB ${operation} failed for ${collection}.`);
+  persistenceError.status = 503;
+  persistenceError.code = 'PERSISTENCE_UNAVAILABLE';
+  persistenceError.cause = error;
+  return persistenceError;
+};
 
 const COLLECTION_CONFIG = {
   catalog_datasets: { idField: 'dataset_key' },
@@ -80,16 +93,27 @@ const enqueueWrite = async (collection, handler) => {
 };
 
 const readCollection = async (collection) => {
+  if (fileFallbackCollections.has(collection)) {
+    return readFileCollection(collection);
+  }
+
   if (isMongoConnected()) {
     const mongoCollection = getMongoCollection(collection);
     if (mongoCollection) {
       try {
         const records = await mongoCollection.find({}).toArray();
         return records.map((record) => sanitizeMongoDocument(record));
-      } catch {
-        // Atlas SQL read-only endpoint — fall through to file
+      } catch (error) {
+        if (!shouldUseFileFallback()) {
+          throw createPersistenceError(collection, 'read', error);
+        }
+        fileFallbackCollections.add(collection);
       }
     }
+  }
+
+  if (!shouldUseFileFallback()) {
+    throw createPersistenceError(collection, 'read', new Error('MongoDB is not connected.'));
   }
 
   return readFileCollection(collection);
@@ -98,10 +122,12 @@ const readCollection = async (collection) => {
 const writeCollection = async (collection, records) => enqueueWrite(collection, async () => {
   if (isMongoConnected()) {
     const mongoCollection = getMongoCollection(collection);
-    if (mongoCollection && records.length > 0) {
+    if (mongoCollection) {
       const config = COLLECTION_CONFIG[collection];
       try {
-        if (config && config.idField) {
+        if (records.length === 0) {
+          await mongoCollection.deleteMany({});
+        } else if (config && config.idField) {
           const operations = records.map((record) => ({
             replaceOne: {
               filter: { [config.idField]: record[config.idField] },
@@ -115,12 +141,20 @@ const writeCollection = async (collection, records) => enqueueWrite(collection, 
           await mongoCollection.insertMany(records, { ordered: false });
         }
         return records;
-      } catch {
-        // Fall through to file fallback
+      } catch (error) {
+        if (!shouldUseFileFallback()) {
+          throw createPersistenceError(collection, 'write', error);
+        }
+        fileFallbackCollections.add(collection);
       }
     }
   }
 
+  if (!shouldUseFileFallback()) {
+    throw createPersistenceError(collection, 'write', new Error('MongoDB is not connected.'));
+  }
+
+  fileFallbackCollections.add(collection);
   return writeFileCollection(collection, records);
 });
 
@@ -131,12 +165,20 @@ const appendRecord = async (collection, record) => {
       try {
         await mongoCollection.insertOne({ ...record });
         return record;
-      } catch {
-        // Fall through to file fallback
+      } catch (error) {
+        if (!shouldUseFileFallback()) {
+          throw createPersistenceError(collection, 'append', error);
+        }
+        fileFallbackCollections.add(collection);
       }
     }
   }
 
+  if (!shouldUseFileFallback()) {
+    throw createPersistenceError(collection, 'append', new Error('MongoDB is not connected.'));
+  }
+
+  fileFallbackCollections.add(collection);
   const records = await readFileCollection(collection);
   records.push(record);
   await writeFileCollection(collection, records);
@@ -144,18 +186,33 @@ const appendRecord = async (collection, record) => {
 };
 
 const findRecordByField = async (collection, field, value) => {
+  if (fileFallbackCollections.has(collection)) {
+    const records = await readFileCollection(collection);
+    return records.find((record) => record[field] === value) || null;
+  }
+
   if (isMongoConnected()) {
     const mongoCollection = getMongoCollection(collection);
     if (mongoCollection) {
       try {
         const record = await mongoCollection.findOne({ [field]: value });
-        return sanitizeMongoDocument(record);
-      } catch {
-        // Fall through to file fallback
+        if (record || !shouldUseFileFallback()) {
+          return sanitizeMongoDocument(record);
+        }
+      } catch (error) {
+        if (!shouldUseFileFallback()) {
+          throw createPersistenceError(collection, 'lookup', error);
+        }
+        fileFallbackCollections.add(collection);
       }
     }
   }
 
+  if (!shouldUseFileFallback()) {
+    throw createPersistenceError(collection, 'lookup', new Error('MongoDB is not connected.'));
+  }
+
+  fileFallbackCollections.add(collection);
   const records = await readFileCollection(collection);
   return records.find((record) => record[field] === value) || null;
 };

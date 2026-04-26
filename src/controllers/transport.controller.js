@@ -1,5 +1,5 @@
 // YataYat API Controller - Transport
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('crypto');
 const transportData = require('../data/transportData');
 const { appendRecord } = require('../services/persistence.service');
 const { getDataset } = require('../services/catalog.service');

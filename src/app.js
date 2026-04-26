@@ -27,6 +27,7 @@ const vercelPreviewPattern = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i;
 const isAllowedOrigin = (origin) => {
   if (!origin) return true;
   if (allowedOrigins.length === 0) return true;
+  if (allowedOrigins.includes('*')) return true;
   if (allowedOrigins.includes(origin)) return true;
 
   const allowVercelPreviews = process.env.CORS_ALLOW_VERCEL_PREVIEWS !== 'false';
