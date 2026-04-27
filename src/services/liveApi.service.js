@@ -1,3 +1,10 @@
+/**
+ * DISCLAIMER:
+ * This is a non-profit, open-source project. All live data fetched from public APIs 
+ * (NRB, USGS, Open-Meteo, Kalimati Market, World Bank, etc.) are strictly for 
+ * educational and informational purposes. Copyrights and intellectual property 
+ * of the original data belong to their respective organizations and sources.
+ */
 const axios = require('axios');
 const NodeCache = require('node-cache');
 const cache = new NodeCache({ stdTTL: 600 });
@@ -408,34 +415,66 @@ exports.fetchKalimati = async () => {
   const cached = cache.get('kalimati');
   if (cached) return cached;
   try {
-    // Government Kalimati market price API
-    const { data } = await axios.get('https://kalimatimarket.gov.np/lang/en/priceLang', {
+    // Government Kalimati market price API (Main page now holds the daily table)
+    const { data } = await axios.get('https://kalimatimarket.gov.np/', {
       timeout: 10000,
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; NepalAPI/1.0)',
         'Accept': 'application/json, text/html'
       }
     });
-    // Try to parse the table from HTML response
+
     const rows = [];
-    const regex = /<td[^>]*>(.*?)<\/td>/gi;
-    const cells = [];
-    let m;
-    while ((m = regex.exec(data)) !== null) {
-      cells.push(m[1].replace(/<[^>]+>/g, '').trim());
-    }
-    for (let i = 0; i + 3 < cells.length; i += 4) {
-      const [commodity, unit, min_price, max_price] = cells.slice(i, i + 4);
-      if (commodity && unit && !isNaN(parseFloat(min_price))) {
-        rows.push({ commodity, unit, min_price: parseFloat(min_price), max_price: parseFloat(max_price) });
+    const tableMatch = data.match(/id="commodityDailyPrice"[^>]*>([\s\S]*?)<\/table>/i);
+    
+    if (tableMatch) {
+      const trRegex = /<tr>([\s\S]*?)<\/tr>/gi;
+      let trMatch;
+      while ((trMatch = trRegex.exec(tableMatch[1])) !== null) {
+        const tdRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+        const cells = [];
+        let tdMatch;
+        while ((tdMatch = tdRegex.exec(trMatch[1])) !== null) {
+          cells.push(tdMatch[1].trim());
+        }
+        
+        if (cells.length >= 4) {
+          // Parse commodity and unit
+          const commodityHtml = cells[0];
+          const unitMatch = commodityHtml.match(/<span[^>]*>\((.*?)\)<\/span>/i) || commodityHtml.match(/\((.*?)\)/);
+          const unit = unitMatch ? unitMatch[1].replace(/<[^>]*>/g, '').trim() : '';
+          const commodity = commodityHtml.replace(/<span[^>]*>.*?<\/span>/i, '').replace(/\(.*?\)/, '').trim();
+          
+          // Helper to convert Nepali numerals and parse float
+          const parseNepaliPrice = (str) => {
+            if (!str) return NaN;
+            const cleanStr = str.replace(/<[^>]*>/g, '').replace(/रू\s*/g, '').trim();
+            const enStr = cleanStr.replace(/[०-९]/g, d => '०१२३४५६७८९'.indexOf(d));
+            return parseFloat(enStr);
+          };
+          
+          const min_price = parseNepaliPrice(cells[1]);
+          const max_price = parseNepaliPrice(cells[2]);
+          
+          // Valid commodity checks (ignore header or malformed rows)
+          if (commodity && commodity !== 'कृषि उपज' && !isNaN(min_price)) {
+            rows.push({ 
+              commodity, 
+              unit: unit || 'kg', 
+              min_price, 
+              max_price: isNaN(max_price) ? min_price : max_price 
+            });
+          }
+        }
       }
     }
+
     if (rows.length > 3) {
       cache.set('kalimati', rows, 3600);
       return rows;
     }
     return null;
-  } catch {
+  } catch (e) {
     return null;
   }
 };
