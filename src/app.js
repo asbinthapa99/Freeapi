@@ -147,6 +147,16 @@ app.use('/api/v1/health', require('./routes/health.routes'));
 app.use('/api/v1/gov', require('./routes/gov.routes'));
 app.use('/api/v1/jobs', require('./routes/jobs.routes'));
 app.use('/api/v1/transport', require('./routes/transport.routes'));
+app.use('/api/v1/nepse', require('./routes/nepse.routes'));
+app.use('/api/v1/news', require('./routes/news.routes'));
+app.use('/api/v1/energy', require('./routes/energy.routes'));
+app.use('/api/v1/ent', require('./routes/ent.routes'));
+app.use('/api/v1/weather', require('./routes/weather.routes'));
+app.use('/api/v1/fuel', require('./routes/fuel.routes'));
+app.use('/api/v1/gold', require('./routes/gold.routes'));
+app.use('/api/v1/calendar', require('./routes/calendar.routes'));
+app.use('/api/v1/cricket', require('./routes/cricket.routes'));
+app.use('/api/v1/festivals', require('./routes/festivals.routes'));
 
 // Global Error Handler
 // 404 Handler

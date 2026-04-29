@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nepal API Ecosystem — Free APIs for Nepal</title>
-  <meta name="description" content="10 production-ready free REST APIs built for Nepal. Agriculture, Tourism, Finance, Health, Transport and more." />
+  <meta name="description" content="21 production-ready free REST APIs built for Nepal. Agriculture, Tourism, Finance, Health, Transport, NEPSE, Weather, Gold, Fuel, Cricket, Festivals and more." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
@@ -58,7 +58,7 @@
   <div class="hero-inner">
     <div class="hero-badge">
       <span class="badge-dot"></span>
-      10 APIs · Completely Free · Production Ready
+      21 APIs · Completely Free · Production Ready
     </div>
 
     <h1 class="hero-title">
@@ -142,12 +142,12 @@ data = res.json()[<span class="c-str">'data'</span>]
 <div class="stats-bar">
   <div class="stats-inner">
     <div class="stat">
-      <span class="stat-num">10</span>
+      <span class="stat-num">21</span>
       <span class="stat-label">APIs</span>
     </div>
     <div class="stat-divider"></div>
     <div class="stat">
-      <span class="stat-num">40+</span>
+      <span class="stat-num">90+</span>
       <span class="stat-label">Endpoints</span>
     </div>
     <div class="stat-divider"></div>
@@ -591,6 +591,419 @@ data = res.json()[<span class="c-str">'data'</span>]
         <div class="api-footer">
           <code class="api-base">/api/v1/transport</code>
           <span class="endpoint-count">7 endpoints</span>
+        </div>
+      </div>
+
+      <!-- NEPSE Stock Market -->
+      <div class="api-card reveal reveal-delay-1">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(234,179,8,0.1);border-color:rgba(234,179,8,0.2)">
+            <span>📈</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">NEPSE</h3>
+            <span class="api-category">Stock Market</span>
+          </div>
+          <span class="api-badge badge-free">Live</span>
+        </div>
+        <p class="api-desc">Live NEPSE indices, top gainers &amp; losers, market status, and registered broker list from Nepal Stock Exchange.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/nepse/live">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/nepse/live</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/nepse/live" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/nepse/top-gainers">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/nepse/top-gainers</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/nepse/top-gainers" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/nepse/market-status">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/nepse/market-status</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/nepse/market-status" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/nepse</code>
+          <span class="endpoint-count">5 endpoints</span>
+        </div>
+      </div>
+
+      <!-- News -->
+      <div class="api-card reveal reveal-delay-3">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.2)">
+            <span>📰</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">Nepal News</h3>
+            <span class="api-category">News</span>
+          </div>
+          <span class="api-badge badge-free">Live</span>
+        </div>
+        <p class="api-desc">Live news headlines scraped from OnlineKhabar, Setopati, Ratopati, and eKantipur RSS feeds in real time.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/news/headlines">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/news/headlines</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/news/headlines" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/news/source/onlinekhabar">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/news/source/:source</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/news/source/onlinekhabar" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/news/feeds">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/news/feeds</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/news/feeds" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/news</code>
+          <span class="endpoint-count">3 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Weather -->
+      <div class="api-card reveal reveal-delay-6">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(14,165,233,0.1);border-color:rgba(14,165,233,0.2)">
+            <span>⛅</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">Nepal Weather</h3>
+            <span class="api-category">Weather</span>
+          </div>
+          <span class="api-badge badge-free">Live</span>
+        </div>
+        <p class="api-desc">Live weather for 10 major Nepal cities powered by Open-Meteo — no API key required. Temperature, humidity, wind, condition.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/weather">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/weather</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/weather" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/weather/city/kathmandu">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/weather/city/:city</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/weather/city/kathmandu" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/weather/cities">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/weather/cities</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/weather/cities" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/weather</code>
+          <span class="endpoint-count">3 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Fuel Prices -->
+      <div class="api-card reveal reveal-delay-1">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.2)">
+            <span>⛽</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">Fuel Prices</h3>
+            <span class="api-category">NOC</span>
+          </div>
+          <span class="api-badge badge-free">Free</span>
+        </div>
+        <p class="api-desc">Nepal Oil Corporation fuel prices — petrol, diesel, kerosene, LP gas per litre in NPR. Live scrape with fallback.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/fuel/prices">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/fuel/prices</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/fuel/prices" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/fuel/history">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/fuel/history</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/fuel/history" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/fuel</code>
+          <span class="endpoint-count">2 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Gold & Silver -->
+      <div class="api-card reveal reveal-delay-3">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(234,179,8,0.15);border-color:rgba(234,179,8,0.3)">
+            <span>🪙</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">Gold &amp; Silver</h3>
+            <span class="api-category">FENEGOSIDA</span>
+          </div>
+          <span class="api-badge badge-free">Live</span>
+        </div>
+        <p class="api-desc">Daily gold and silver rates in NPR per tola from FENEGOSIDA. Fine gold (24K), tejabilo, silver. Gold weight converter included.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/gold/rates">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/gold/rates</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/gold/rates" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/gold/convert?weight_grams=10&karat=22">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/gold/convert?weight_grams=&amp;karat=</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/gold/convert?weight_grams=10&karat=22" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/gold/history">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/gold/history</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/gold/history" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/gold</code>
+          <span class="endpoint-count">3 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Calendar -->
+      <div class="api-card reveal reveal-delay-6">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.2)">
+            <span>📅</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">BS Calendar</h3>
+            <span class="api-category">Bikram Sambat</span>
+          </div>
+          <span class="api-badge badge-free">Free</span>
+        </div>
+        <p class="api-desc">Bikram Sambat ↔ Gregorian date conversion, today's BS date, Nepal public holidays, and all 12 BS month names.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/calendar/today">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/calendar/today</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/calendar/today" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/calendar/convert/ad-to-bs?date=2026-04-14">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/calendar/convert/ad-to-bs?date=</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/calendar/convert/ad-to-bs?date=2026-04-14" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/calendar/holidays">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/calendar/holidays</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/calendar/holidays" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/calendar</code>
+          <span class="endpoint-count">5 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Cricket -->
+      <div class="api-card reveal reveal-delay-1">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.2)">
+            <span>🏏</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">Nepal Cricket</h3>
+            <span class="api-category">Sports</span>
+          </div>
+          <span class="api-badge badge-free">Free</span>
+        </div>
+        <p class="api-desc">Nepal national cricket team fixtures, recent results, current squad, and team stats. Powered by ESPNcricinfo.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/cricket/fixtures">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/cricket/fixtures</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/cricket/fixtures" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/cricket/results">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/cricket/results</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/cricket/results" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/cricket/squad">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/cricket/squad</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/cricket/squad" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/cricket</code>
+          <span class="endpoint-count">4 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Energy -->
+      <div class="api-card reveal reveal-delay-3">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(234,179,8,0.1);border-color:rgba(234,179,8,0.2)">
+            <span>⚡</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">Nepal Energy</h3>
+            <span class="api-category">NEA / Hydro</span>
+          </div>
+          <span class="api-badge badge-free">Free</span>
+        </div>
+        <p class="api-desc">NEA electricity tariff rates, planned outages, 10 major hydropower plants, and national energy summary.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/energy/tariff">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/energy/tariff</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/energy/tariff" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/energy/hydro">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/energy/hydro</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/energy/hydro" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/energy/outages">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/energy/outages</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/energy/outages" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/energy</code>
+          <span class="endpoint-count">4 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Festivals -->
+      <div class="api-card reveal reveal-delay-6">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.2)">
+            <span>🎉</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">Nepal Festivals</h3>
+            <span class="api-category">Culture</span>
+          </div>
+          <span class="api-badge badge-free">Free</span>
+        </div>
+        <p class="api-desc">20+ Nepal festivals — Dashain, Tihar, Holi, Indra Jatra, Buddha Jayanti and more with dates, significance and regions.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/festivals">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/festivals</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/festivals" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/festivals/upcoming">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/festivals/upcoming</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/festivals/upcoming" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/festivals/types">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/festivals/types</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/festivals/types" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/festivals</code>
+          <span class="endpoint-count">3 endpoints</span>
+        </div>
+      </div>
+
+      <!-- Entertainment -->
+      <div class="api-card reveal reveal-delay-1">
+        <div class="api-card-header">
+          <div class="api-card-icon-wrap" style="background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.2)">
+            <span>🎬</span>
+          </div>
+          <div class="api-card-meta">
+            <h3 class="api-name">Entertainment</h3>
+            <span class="api-category">Movies &amp; Events</span>
+          </div>
+          <span class="api-badge badge-free">Free</span>
+        </div>
+        <p class="api-desc">Movies now showing in Nepal cinemas (QFX, Big Movies), upcoming cultural events, and cinema locations nationwide.</p>
+        <div class="api-endpoints">
+          <div class="ep-row" data-method="GET" data-path="/api/v1/ent/movies">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/ent/movies</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/ent/movies" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/ent/events">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/ent/events</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/ent/events" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+          <div class="ep-row" data-method="GET" data-path="/api/v1/ent/cinemas">
+            <span class="ep-method m-get">GET</span><code class="ep-path">/ent/cinemas</code>
+            <div class="ep-actions">
+              <a class="ep-try" href="/api/v1/ent/cinemas" target="_blank" title="Try in browser">↗</a>
+              <button class="ep-copy" title="Copy URL">⎘</button>
+            </div>
+          </div>
+        </div>
+        <div class="api-footer">
+          <code class="api-base">/api/v1/ent</code>
+          <span class="endpoint-count">3 endpoints</span>
         </div>
       </div>
 

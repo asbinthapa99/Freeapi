@@ -1,6 +1,6 @@
 # Nepal API Ecosystem
 
-**10 free, production-ready REST APIs built for Nepal.** Agriculture prices, trekking permits, health triage, transport booking, forex rates, job matching, and more — all under one base URL.
+**21 free, production-ready REST APIs built for Nepal.** Agriculture, tourism, finance, health, transport, NEPSE stock data, live weather, gold & silver rates, fuel prices, Bikram Sambat calendar, Nepal cricket, festivals, news, energy, and more — all under one base URL.
 
 > 📖 **Swagger Docs:** [`/docs`](https://nepal-api-production.up.railway.app/docs) &nbsp;|&nbsp; ⚡ **Health:** [`/health`](https://nepal-api-production.up.railway.app/health) &nbsp;|&nbsp; 🌐 **Landing:** [freeapi-six.vercel.app](https://freeapi-six.vercel.app)
 
@@ -217,6 +217,125 @@ curl "https://nepal-api-production.up.railway.app/api/v1/jobs/search?category=IT
 
 ---
 
+### 📈 NEPSE — `/api/v1/nepse`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/nepse/live` | Live NEPSE index from Nepal Stock Exchange |
+| GET | `/nepse/top-gainers` | Top gaining stocks today |
+| GET | `/nepse/top-losers` | Top losing stocks today |
+| GET | `/nepse/market-status` | Is market open? Trading hours |
+| GET | `/nepse/brokers` | Registered NEPSE broker list |
+
+---
+
+### 📰 News — `/api/v1/news`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/news/headlines` | Aggregated headlines from all RSS sources |
+| GET | `/news/source/:source` | News from a specific source (`onlinekhabar`, `setopati`, `ratopati`, `ekantipur`) |
+| GET | `/news/feeds` | List all available RSS feed sources |
+
+---
+
+### ⛅ Weather — `/api/v1/weather`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/weather` | Live weather for all 10 major Nepal cities |
+| GET | `/weather/city/:city` | Weather for a specific city (e.g. `kathmandu`, `pokhara`) |
+| GET | `/weather/cities` | List of available cities with coordinates |
+
+Cities available: Kathmandu, Pokhara, Biratnagar, Bhaktapur, Lalitpur, Birgunj, Dharan, Butwal, Hetauda, Chitwan.
+
+---
+
+### ⛽ Fuel Prices — `/api/v1/fuel`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/fuel/prices` | Current petrol, diesel, kerosene prices (NPR/litre) |
+| GET | `/fuel/history` | Recent NOC price change history |
+
+---
+
+### 🪙 Gold & Silver — `/api/v1/gold`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/gold/rates` | Today's gold (24K, tejabilo) and silver rates per tola |
+| GET | `/gold/history` | Recent rate history |
+| GET | `/gold/convert?weight_grams=&karat=` | Estimate value of gold by weight and karat |
+
+```bash
+curl "https://nepal-api-production.up.railway.app/api/v1/gold/convert?weight_grams=10&karat=22"
+```
+
+---
+
+### 📅 BS Calendar — `/api/v1/calendar`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/calendar/today` | Today's date in both AD and BS (Bikram Sambat) |
+| GET | `/calendar/convert/ad-to-bs?date=YYYY-MM-DD` | Convert AD date to BS |
+| GET | `/calendar/convert/bs-to-ad?year=&month=&day=` | Convert BS date to AD |
+| GET | `/calendar/holidays` | Nepal public holidays |
+| GET | `/calendar/months` | BS month names in English and Nepali |
+
+```bash
+curl "https://nepal-api-production.up.railway.app/api/v1/calendar/convert/ad-to-bs?date=2026-04-14"
+```
+
+---
+
+### 🏏 Cricket — `/api/v1/cricket`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/cricket/fixtures` | Upcoming Nepal national team fixtures |
+| GET | `/cricket/results` | Recent match results |
+| GET | `/cricket/squad` | Current squad with roles and caps |
+| GET | `/cricket/stats` | Team stats, ICC ranking, home ground |
+
+---
+
+### ⚡ Energy — `/api/v1/energy`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/energy/tariff` | NEA electricity tariff by category (NPR/kWh) |
+| GET | `/energy/hydro` | Major Nepal hydropower plants with capacity |
+| GET | `/energy/outages` | Scheduled power outages |
+| GET | `/energy/summary` | National energy summary (installed MW, coverage %) |
+
+---
+
+### 🎉 Festivals — `/api/v1/festivals`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/festivals` | All Nepal festivals (Hindu, Buddhist, Newari, National) |
+| GET | `/festivals/upcoming` | Festivals in the current/next month |
+| GET | `/festivals/types` | Festival types available |
+
+```bash
+curl "https://nepal-api-production.up.railway.app/api/v1/festivals?type=Buddhist"
+```
+
+---
+
+### 🎬 Entertainment — `/api/v1/ent`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/ent/movies` | Movies now showing in Nepal cinemas |
+| GET | `/ent/events` | Upcoming cultural and sporting events |
+| GET | `/ent/cinemas` | Cinema locations (QFX, Big Movies, etc.) |
+
+---
+
 ## Authentication
 
 Admin endpoints require a Bearer token:
@@ -241,7 +360,7 @@ These routes fetch real data from free public APIs:
 
 | Endpoint | Provider |
 |----------|----------|
-| `/finance/forex/rates` | Nepal Rastra Bank |
+| `/finance/forex/rates` | Nepal Rastra Bank (NRB) |
 | `/finance/inflation` | World Bank |
 | `/finance/banks/branches` | OpenStreetMap (Overpass) |
 | `/disaster/earthquakes/recent` | USGS Earthquake Hazards |
@@ -250,8 +369,18 @@ These routes fetch real data from free public APIs:
 | `/health/facilities/nearby` | OpenStreetMap (Overpass) |
 | `/gov/offices/ward` | OpenStreetMap (Overpass) |
 | `/tourism/treks/routes` | OpenStreetMap (Overpass) |
-| `/tourism/teahouses/availability` | OpenStreetMap (Overpass) |
 | `/transport/routes/search` | OpenStreetMap (Overpass) |
+| `/nepse/live` | Nepal Stock Exchange API |
+| `/nepse/top-gainers` | Nepal Stock Exchange API |
+| `/news/headlines` | OnlineKhabar / Setopati / Ratopati / eKantipur RSS |
+| `/weather` | Open-Meteo — 10 Nepal cities |
+| `/weather/city/:city` | Open-Meteo (no key needed) |
+| `/fuel/prices` | Nepal Oil Corporation (NOC) scrape |
+| `/gold/rates` | FENEGOSIDA scrape |
+| `/cricket/fixtures` | ESPNcricinfo |
+| `/calendar/today` | Algorithmic BS↔AD conversion |
+| `/festivals` | Static cultural calendar |
+| `/energy/tariff` | NEA tariff data |
 
 All live endpoints fall back to cached/simulated data when a provider is unreachable. To force `503` instead of fallback data:
 

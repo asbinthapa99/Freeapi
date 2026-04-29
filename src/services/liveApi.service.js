@@ -479,6 +479,200 @@ exports.fetchKalimati = async () => {
   }
 };
 
+// ── Nepal cities for multi-city weather ──────────────────────────────────────
+const NEPAL_CITIES = [
+  { city: 'Kathmandu', lat: 27.7172, lon: 85.3240 },
+  { city: 'Pokhara', lat: 28.2096, lon: 83.9856 },
+  { city: 'Biratnagar', lat: 26.4525, lon: 87.2718 },
+  { city: 'Bhaktapur', lat: 27.6710, lon: 85.4298 },
+  { city: 'Lalitpur', lat: 27.6588, lon: 85.3247 },
+  { city: 'Birgunj', lat: 27.0104, lon: 84.8778 },
+  { city: 'Dharan', lat: 26.8120, lon: 87.2840 },
+  { city: 'Butwal', lat: 27.7006, lon: 83.4532 },
+  { city: 'Hetauda', lat: 27.4264, lon: 85.0313 },
+  { city: 'Chitwan', lat: 27.5291, lon: 84.3542 },
+];
+exports.NEPAL_CITIES = NEPAL_CITIES;
+
+// ── NEPSE Stock Exchange ──────────────────────────────────────────────────────
+exports.fetchNepseData = async () => {
+  if (!areLiveProvidersEnabled()) return null;
+  const cached = getCache('nepse_data');
+  if (cached) return cached;
+  try {
+    const [indexRes, topRes, statusRes] = await Promise.allSettled([
+      axios.get('https://nepalstock.com.np/api/nots/nepse-index', { timeout: defaultTimeout(), headers: { Accept: 'application/json' } }),
+      axios.get('https://nepalstock.com.np/api/nots/top-ten-trade-share', { timeout: defaultTimeout(), headers: { Accept: 'application/json' } }),
+      axios.get('https://nepalstock.com.np/api/nots/market-open', { timeout: defaultTimeout(), headers: { Accept: 'application/json' } }),
+    ]);
+    const index = indexRes.status === 'fulfilled' ? indexRes.value.data : null;
+    const topTraded = topRes.status === 'fulfilled' ? topRes.value.data : null;
+    const marketStatus = statusRes.status === 'fulfilled' ? statusRes.value.data : null;
+    if (!index) return null;
+    const result = { index, topTraded, marketStatus, fetchedAt: new Date().toISOString() };
+    setCache('nepse_data', result, 300);
+    return result;
+  } catch (e) {
+    return null;
+  }
+};
+
+// ── Multi-city Nepal Weather ──────────────────────────────────────────────────
+exports.fetchWeatherAllCities = async () => {
+  if (!areLiveProvidersEnabled()) return null;
+  const cached = getCache('weather_all_cities');
+  if (cached) return cached;
+  try {
+    const results = await Promise.allSettled(
+      NEPAL_CITIES.map(({ city, lat, lon }) =>
+        exports.fetchWeather(lat, lon).then(w => (w ? { city, lat, lon, ...w } : null))
+      )
+    );
+    const cities = results.filter(r => r.status === 'fulfilled' && r.value).map(r => r.value);
+    if (!cities.length) return null;
+    setCache('weather_all_cities', cities, 1800);
+    return cities;
+  } catch (e) {
+    return null;
+  }
+};
+
+// ── News RSS Feeds ────────────────────────────────────────────────────────────
+const RSS_FEEDS = {
+  onlinekhabar: 'https://www.onlinekhabar.com/feed',
+  setopati: 'https://setopati.com/feed',
+  ratopati: 'https://ratopati.com/feed',
+  ekantipur: 'https://ekantipur.com/rss',
+};
+exports.RSS_FEED_SOURCES = Object.keys(RSS_FEEDS);
+
+const parseRSSItems = (xml, source, limit = 15) => {
+  const items = [];
+  const blocks = xml.match(/<item[^>]*>[\s\S]*?<\/item>/gi) || [];
+  for (const block of blocks.slice(0, limit)) {
+    const get = (tag) => {
+      const m = block.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`, 'i'))
+        || block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'));
+      return m ? m[1].trim().replace(/<[^>]+>/g, '') : '';
+    };
+    const title = get('title');
+    if (title) items.push({ title, link: get('link'), published: get('pubDate'), summary: get('description').slice(0, 200), source });
+  }
+  return items;
+};
+
+exports.fetchNewsRSS = async (source = 'onlinekhabar', limit = 15) => {
+  if (!areLiveProvidersEnabled()) return null;
+  const cacheKey = `news_rss_${source}`;
+  const cached = getCache(cacheKey);
+  if (cached) return cached;
+  const url = RSS_FEEDS[source];
+  if (!url) return null;
+  try {
+    const res = await axios.get(url, {
+      timeout: defaultTimeout(),
+      headers: { 'User-Agent': 'NepalAPI/1.0', Accept: 'application/rss+xml, text/xml' },
+    });
+    const items = parseRSSItems(res.data, source, limit);
+    if (!items.length) return null;
+    setCache(cacheKey, items, 900);
+    return items;
+  } catch (e) {
+    return null;
+  }
+};
+
+exports.fetchAllNewsRSS = async (limit = 8) => {
+  if (!areLiveProvidersEnabled()) return null;
+  const cached = getCache('news_rss_all');
+  if (cached) return cached;
+  const results = await Promise.allSettled(Object.keys(RSS_FEEDS).map(s => exports.fetchNewsRSS(s, limit)));
+  const combined = results.filter(r => r.status === 'fulfilled' && Array.isArray(r.value)).flatMap(r => r.value);
+  if (!combined.length) return null;
+  setCache('news_rss_all', combined, 900);
+  return combined;
+};
+
+// ── Fuel Prices (NOC Nepal) ───────────────────────────────────────────────────
+exports.fetchFuelPrices = async () => {
+  if (!areLiveProvidersEnabled()) return null;
+  const cached = getCache('fuel_prices');
+  if (cached) return cached;
+  try {
+    const res = await axios.get('https://noc.org.np/', {
+      timeout: defaultTimeout(),
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NepalAPI/1.0)' },
+    });
+    const html = res.data;
+    const grab = (pattern) => { const m = html.match(pattern); return m ? parseFloat(m[1].replace(/,/g, '')) : null; };
+    const petrol = grab(/[Pp]etrol[^0-9]*?([\d,]+(?:\.\d+)?)\s*(?:per litre|\/litre|NPR)?/);
+    const diesel = grab(/[Dd]iesel[^0-9]*?([\d,]+(?:\.\d+)?)\s*(?:per litre|\/litre|NPR)?/);
+    const kerosene = grab(/[Kk]erosene[^0-9]*?([\d,]+(?:\.\d+)?)\s*(?:per litre|\/litre|NPR)?/);
+    if (petrol || diesel) {
+      const data = { petrol_per_litre: petrol, diesel_per_litre: diesel, kerosene_per_litre: kerosene, currency: 'NPR', source: 'Nepal Oil Corporation', source_url: 'https://noc.org.np/', fetchedAt: new Date().toISOString() };
+      setCache('fuel_prices', data, 21600);
+      return data;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+};
+
+// ── Gold & Silver Rates (FENEGOSIDA) ─────────────────────────────────────────
+exports.fetchGoldRates = async () => {
+  if (!areLiveProvidersEnabled()) return null;
+  const cached = getCache('gold_rates');
+  if (cached) return cached;
+  try {
+    const res = await axios.get('https://www.fenegosida.org.np/', {
+      timeout: defaultTimeout(),
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NepalAPI/1.0)' },
+    });
+    const html = res.data;
+    const grab = (pattern) => { const m = html.match(pattern); return m ? parseFloat(m[1].replace(/,/g, '')) : null; };
+    const fine = grab(/(?:Fine Gold|24\s*[Kk])[^0-9]*([\d,]+(?:\.\d+)?)/i);
+    const tejabilo = grab(/[Tt]ejabilo[^0-9]*([\d,]+(?:\.\d+)?)/i);
+    const silver = grab(/[Ss]ilver[^0-9]*([\d,]+(?:\.\d+)?)/i);
+    if (fine) {
+      const data = { fine_gold_per_tola_npr: fine, tejabilo_gold_per_tola_npr: tejabilo, silver_per_tola_npr: silver, unit: 'tola (11.664g)', source: 'FENEGOSIDA', source_url: 'https://www.fenegosida.org.np/', date: new Date().toISOString().split('T')[0], fetchedAt: new Date().toISOString() };
+      setCache('gold_rates', data, 3600);
+      return data;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+};
+
+// ── Nepal Cricket (ESPNcricinfo) ──────────────────────────────────────────────
+exports.fetchCricketFixtures = async () => {
+  if (!areLiveProvidersEnabled()) return null;
+  const cached = getCache('cricket_fixtures');
+  if (cached) return cached;
+  try {
+    const res = await axios.get('https://hs-consumer-api.espncricinfo.com/v1/pages/team/schedule?lang=en&teamId=44', {
+      timeout: defaultTimeout(),
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NepalAPI/1.0)', Accept: 'application/json' },
+    });
+    const matches = (res.data?.content || []).slice(0, 10).map(m => ({
+      match_id: m.match?.objectId,
+      title: m.match?.title,
+      status: m.match?.statusText,
+      date: m.match?.startDate,
+      format: m.match?.matchFormat,
+      series: m.match?.series?.longName,
+      venue: m.match?.ground?.longName,
+      teams: (m.match?.teams || []).map(t => t.longName),
+    }));
+    if (!matches.length) return null;
+    setCache('cricket_fixtures', matches, 1800);
+    return matches;
+  } catch (e) {
+    return null;
+  }
+};
+
 exports.isStrictLiveMode = isStrictLiveMode;
 exports.areLiveProvidersEnabled = areLiveProvidersEnabled;
 
