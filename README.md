@@ -18,18 +18,62 @@ No API key needed for public read endpoints. Write endpoints require a Bearer to
 
 ## Quick Start
 
+**JavaScript (fetch)**
+```js
+// Live weather for Kathmandu
+const res = await fetch('https://nepal-api-production.up.railway.app/api/v1/weather/city/kathmandu');
+const { data } = await res.json();
+console.log(data.temperature_c, data.condition);
+
+// Today in Bikram Sambat
+const bs = await fetch('https://nepal-api-production.up.railway.app/api/v1/calendar/today');
+const { data: cal } = await bs.json();
+console.log(cal.bs.date, cal.bs.month_name); // "2082-01-16 Baishakh"
+
+// Live NRB forex rates
+const fx = await fetch('https://nepal-api-production.up.railway.app/api/v1/finance/forex/rates');
+const { data: forex } = await fx.json();
+```
+
+**Python (requests)**
+```python
+import requests
+
+BASE = 'https://nepal-api-production.up.railway.app/api/v1'
+
+# NEPSE live index
+nepse = requests.get(f'{BASE}/nepse/live').json()
+print(nepse['data']['index'])
+
+# Gold rates
+gold = requests.get(f'{BASE}/gold/rates').json()['data']
+print(f"Fine gold: NPR {gold['fine_gold_per_tola_npr']} / tola")
+
+# Job search
+jobs = requests.get(f'{BASE}/jobs/search', params={'category': 'IT', 'location': 'Kathmandu'}).json()
+for j in jobs['data']['jobs']:
+    print(j['title'], '—', j['company'])
+```
+
+**cURL**
 ```bash
 # Health check
 curl https://nepal-api-production.up.railway.app/health
 
-# Live NRB forex rates
-curl https://nepal-api-production.up.railway.app/api/v1/finance/forex/rates
+# Live weather (10 Nepal cities)
+curl https://nepal-api-production.up.railway.app/api/v1/weather
 
-# Live USGS earthquakes (Nepal region)
-curl https://nepal-api-production.up.railway.app/api/v1/disaster/earthquakes/recent
+# Gold & silver rates
+curl https://nepal-api-production.up.railway.app/api/v1/gold/rates
 
-# Job search
-curl "https://nepal-api-production.up.railway.app/api/v1/jobs/search?category=IT&location=Kathmandu"
+# Today in Bikram Sambat
+curl https://nepal-api-production.up.railway.app/api/v1/calendar/today
+
+# News headlines (all sources)
+curl https://nepal-api-production.up.railway.app/api/v1/news/headlines
+
+# NEPSE stock market
+curl https://nepal-api-production.up.railway.app/api/v1/nepse/live
 ```
 
 ---

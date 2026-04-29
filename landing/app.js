@@ -116,8 +116,33 @@ document.querySelectorAll('.example-tab').forEach(tab => {
     document.querySelectorAll('.example-content').forEach(c => c.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById('example-' + tab.dataset.example).classList.add('active');
+    // re-apply current language selection to newly visible content
+    applyLang(activeLang());
   });
 });
+
+// ── Language switcher ──
+function activeLang() {
+  const btn = document.querySelector('.lang-btn.active');
+  return btn ? btn.dataset.lang : 'js';
+}
+function applyLang(lang) {
+  document.querySelectorAll('.code-block[class*="lang-"]').forEach(el => {
+    el.classList.remove('active');
+  });
+  document.querySelectorAll(`.code-block.lang-${lang}`).forEach(el => {
+    el.classList.add('active');
+  });
+}
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyLang(btn.dataset.lang);
+  });
+});
+// show JS by default on load
+applyLang('js');
 
 // ── Endpoint copy buttons ──
 document.querySelectorAll('.ep-copy').forEach(btn => {
