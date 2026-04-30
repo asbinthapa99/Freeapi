@@ -541,7 +541,14 @@ body {
 }
 .example-tab:hover { background: var(--bg-3); color: var(--text); }
 .example-tab.active { background: var(--bg-3); color: var(--text); }
-.example-panel { overflow: hidden; }
+.example-main {
+  min-width: 0;
+  overflow: hidden;
+}
+.example-panel {
+  min-width: 0;
+  overflow: hidden;
+}
 .example-content { display: none; }
 .example-content.active { display: block; }
 .example-meta {
@@ -551,8 +558,17 @@ body {
   padding: 14px 20px;
   border-bottom: 1px solid var(--border);
   background: var(--bg-3);
+  min-width: 0;
 }
-.example-meta code { font-family: var(--mono); font-size: 13px; color: var(--text-2); }
+.example-meta code {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text-2);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .method {
   font-size: 11px;
   font-weight: 700;
@@ -567,6 +583,7 @@ body {
   padding: 24px;
   overflow-x: auto;
   background: var(--bg-2);
+  max-width: 100%;
 }
 
 /* ── BASE URL ── */
@@ -770,6 +787,13 @@ body {
   }
   .example-nav::-webkit-scrollbar { display: none; }
   .example-tab { white-space: nowrap; }
+  .lang-switcher {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .lang-switcher::-webkit-scrollbar { display: none; }
+  .example-meta { padding: 12px 16px; }
+  .code-block { padding: 18px 16px; }
 
   .base-url-box { flex-direction: column; width: 100%; max-width: 420px; }
   .base-url-box code { font-size: 13px; text-align: center; word-break: break-all; }

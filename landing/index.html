@@ -1073,29 +1073,29 @@ data = res.json()[<span class="c-str">'data'</span>]
         <button class="example-tab" data-example="jobs">Jobs</button>
         <button class="example-tab" data-example="permit">Trek Permit</button>
       </div>
+      <div class="example-main">
+        <!-- Language switcher -->
+        <div class="lang-switcher">
+          <button class="lang-btn active" data-lang="js">JavaScript</button>
+          <button class="lang-btn" data-lang="python">Python</button>
+          <button class="lang-btn" data-lang="curl">cURL</button>
+        </div>
 
-      <!-- Language switcher -->
-      <div class="lang-switcher">
-        <button class="lang-btn active" data-lang="js">JavaScript</button>
-        <button class="lang-btn" data-lang="python">Python</button>
-        <button class="lang-btn" data-lang="curl">cURL</button>
-      </div>
+        <div class="example-panel">
 
-      <div class="example-panel">
-
-        <!-- WEATHER -->
-        <div id="example-weather" class="example-content active">
-          <div class="example-meta">
-            <span class="method get">GET</span>
-            <code>/api/v1/weather/city/kathmandu</code>
-          </div>
-          <pre class="code-block lang-js active"><code><span class="c-kw">const</span> res = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/weather/city/kathmandu'</span>);
+          <!-- WEATHER -->
+          <div id="example-weather" class="example-content active">
+            <div class="example-meta">
+              <span class="method get">GET</span>
+              <code>/api/v1/weather/city/kathmandu</code>
+            </div>
+            <pre class="code-block lang-js active"><code><span class="c-kw">const</span> res = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/weather/city/kathmandu'</span>);
 <span class="c-kw">const</span> { data } = <span class="c-kw">await</span> res.json();
 
 console.log(data.temperature_c);   <span class="c-comment">// 18.4</span>
 console.log(data.condition);       <span class="c-comment">// "Partly Cloudy"</span>
 console.log(data.humidity_percent);<span class="c-comment">// 72</span></code></pre>
-          <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
+            <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
 
 r = requests.get(<span class="c-str">'/api/v1/weather/city/kathmandu'</span>)
 data = r.json()[<span class="c-str">'data'</span>]
@@ -1103,7 +1103,7 @@ data = r.json()[<span class="c-str">'data'</span>]
 print(data[<span class="c-str">'temperature_c'</span>])    <span class="c-comment"># 18.4</span>
 print(data[<span class="c-str">'condition'</span>])        <span class="c-comment"># Partly Cloudy</span>
 print(data[<span class="c-str">'humidity_percent'</span>]) <span class="c-comment"># 72</span></code></pre>
-          <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> /api/v1/weather/city/kathmandu
+            <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> /api/v1/weather/city/kathmandu
 
 <span class="c-comment"># Response</span>
 {
@@ -1117,31 +1117,31 @@ print(data[<span class="c-str">'humidity_percent'</span>]) <span class="c-commen
     <span class="c-key">"wind_kmh"</span>: <span class="c-num">12</span>
   }
 }</code></pre>
-          <div class="live-runner" data-url="/api/v1/weather/city/kathmandu">
-            <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
-            <pre class="live-response" hidden></pre>
+            <div class="live-runner" data-url="/api/v1/weather/city/kathmandu">
+              <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
+              <pre class="live-response" hidden></pre>
+            </div>
           </div>
-        </div>
 
-        <!-- NEPSE -->
-        <div id="example-nepse" class="example-content">
-          <div class="example-meta">
-            <span class="method get">GET</span>
-            <code>/api/v1/nepse/live</code>
-          </div>
-          <pre class="code-block lang-js active"><code><span class="c-kw">const</span> res = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/nepse/live'</span>);
+          <!-- NEPSE -->
+          <div id="example-nepse" class="example-content">
+            <div class="example-meta">
+              <span class="method get">GET</span>
+              <code>/api/v1/nepse/live</code>
+            </div>
+            <pre class="code-block lang-js active"><code><span class="c-kw">const</span> res = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/nepse/live'</span>);
 <span class="c-kw">const</span> { data } = <span class="c-kw">await</span> res.json();
 
 console.log(data.index);      <span class="c-comment">// NEPSE index object</span>
 console.log(data.fetchedAt);  <span class="c-comment">// "2026-04-29T..."</span></code></pre>
-          <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
+            <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
 
 r = requests.get(<span class="c-str">'/api/v1/nepse/live'</span>)
 data = r.json()[<span class="c-str">'data'</span>]
 
 print(data[<span class="c-str">'index'</span>])
 print(data[<span class="c-str">'fetchedAt'</span>])</code></pre>
-          <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> /api/v1/nepse/live
+            <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> /api/v1/nepse/live
 
 <span class="c-comment"># Response (live from Nepal Stock Exchange)</span>
 {
@@ -1152,19 +1152,19 @@ print(data[<span class="c-str">'fetchedAt'</span>])</code></pre>
     <span class="c-key">"fetchedAt"</span>: <span class="c-str">"2026-04-29T..."</span>
   }
 }</code></pre>
-          <div class="live-runner" data-url="/api/v1/nepse/live">
-            <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
-            <pre class="live-response" hidden></pre>
+            <div class="live-runner" data-url="/api/v1/nepse/live">
+              <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
+              <pre class="live-response" hidden></pre>
+            </div>
           </div>
-        </div>
 
-        <!-- GOLD -->
-        <div id="example-gold" class="example-content">
-          <div class="example-meta">
-            <span class="method get">GET</span>
-            <code>/api/v1/gold/rates</code>
-          </div>
-          <pre class="code-block lang-js active"><code><span class="c-kw">const</span> res = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/gold/rates'</span>);
+          <!-- GOLD -->
+          <div id="example-gold" class="example-content">
+            <div class="example-meta">
+              <span class="method get">GET</span>
+              <code>/api/v1/gold/rates</code>
+            </div>
+            <pre class="code-block lang-js active"><code><span class="c-kw">const</span> res = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/gold/rates'</span>);
 <span class="c-kw">const</span> { data } = <span class="c-kw">await</span> res.json();
 
 console.log(<span class="c-str">`Fine gold: NPR ${data.fine_gold_per_tola_npr} / tola`</span>);
@@ -1174,7 +1174,7 @@ console.log(<span class="c-str">`Silver:    NPR ${data.silver_per_tola_npr} / to
 <span class="c-kw">const</span> conv = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/gold/convert?weight_grams=10&karat=22'</span>);
 <span class="c-kw">const</span> val = (<span class="c-kw">await</span> conv.json()).data;
 console.log(<span class="c-str">`10g 22K = NPR ${val.estimated_value_npr}`</span>);</code></pre>
-          <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
+            <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
 
 data = requests.get(<span class="c-str">'/api/v1/gold/rates'</span>).json()[<span class="c-str">'data'</span>]
 print(<span class="c-str">f"Fine gold: NPR {data['fine_gold_per_tola_npr']} / tola"</span>)
@@ -1184,7 +1184,7 @@ print(<span class="c-str">f"Silver:    NPR {data['silver_per_tola_npr']} / tola"
 conv = requests.get(<span class="c-str">'/api/v1/gold/convert'</span>,
          params={<span class="c-str">'weight_grams'</span>: 10, <span class="c-str">'karat'</span>: 22}).json()[<span class="c-str">'data'</span>]
 print(<span class="c-str">f"10g 22K = NPR {conv['estimated_value_npr']}"</span>)</code></pre>
-          <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> /api/v1/gold/rates
+            <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> /api/v1/gold/rates
 
 {
   <span class="c-key">"data"</span>: {
@@ -1197,19 +1197,19 @@ print(<span class="c-str">f"10g 22K = NPR {conv['estimated_value_npr']}"</span>)
 
 <span class="c-comment"># Gold weight converter</span>
 <span class="c-cmd">curl</span> <span class="c-str">"/api/v1/gold/convert?weight_grams=10&karat=22"</span></code></pre>
-          <div class="live-runner" data-url="/api/v1/gold/rates">
-            <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
-            <pre class="live-response" hidden></pre>
+            <div class="live-runner" data-url="/api/v1/gold/rates">
+              <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
+              <pre class="live-response" hidden></pre>
+            </div>
           </div>
-        </div>
 
-        <!-- CALENDAR -->
-        <div id="example-calendar" class="example-content">
-          <div class="example-meta">
-            <span class="method get">GET</span>
-            <code>/api/v1/calendar/today</code>
-          </div>
-          <pre class="code-block lang-js active"><code><span class="c-kw">const</span> res = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/calendar/today'</span>);
+          <!-- CALENDAR -->
+          <div id="example-calendar" class="example-content">
+            <div class="example-meta">
+              <span class="method get">GET</span>
+              <code>/api/v1/calendar/today</code>
+            </div>
+            <pre class="code-block lang-js active"><code><span class="c-kw">const</span> res = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/calendar/today'</span>);
 <span class="c-kw">const</span> { data } = <span class="c-kw">await</span> res.json();
 
 console.log(data.bs.date);        <span class="c-comment">// "2082-01-16" (Bikram Sambat)</span>
@@ -1220,7 +1220,7 @@ console.log(data.ad.date);        <span class="c-comment">// "2026-04-29"</span>
 <span class="c-kw">const</span> cv = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/calendar/convert/ad-to-bs?date=2026-04-14'</span>);
 <span class="c-kw">const</span> bs = (<span class="c-kw">await</span> cv.json()).data.bs;
 console.log(<span class="c-str">`April 14 = ${bs.date} ${bs.month_name}`</span>);</code></pre>
-          <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
+            <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
 
 data = requests.get(<span class="c-str">'/api/v1/calendar/today'</span>).json()[<span class="c-str">'data'</span>]
 print(data[<span class="c-str">'bs'</span>][<span class="c-str">'date'</span>])        <span class="c-comment"># 2082-01-16</span>
@@ -1230,7 +1230,7 @@ print(data[<span class="c-str">'bs'</span>][<span class="c-str">'month_name'</sp
 r = requests.get(<span class="c-str">'/api/v1/calendar/convert/ad-to-bs'</span>,
                  params={<span class="c-str">'date'</span>: <span class="c-str">'2026-04-14'</span>})
 print(r.json()[<span class="c-str">'data'</span>][<span class="c-str">'bs'</span>])</code></pre>
-          <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> /api/v1/calendar/today
+            <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> /api/v1/calendar/today
 
 {
   <span class="c-key">"data"</span>: {
@@ -1241,30 +1241,30 @@ print(r.json()[<span class="c-str">'data'</span>][<span class="c-str">'bs'</span
 
 <span class="c-comment"># AD → BS conversion</span>
 <span class="c-cmd">curl</span> <span class="c-str">"/api/v1/calendar/convert/ad-to-bs?date=2026-04-14"</span></code></pre>
-          <div class="live-runner" data-url="/api/v1/calendar/today">
-            <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
-            <pre class="live-response" hidden></pre>
+            <div class="live-runner" data-url="/api/v1/calendar/today">
+              <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
+              <pre class="live-response" hidden></pre>
+            </div>
           </div>
-        </div>
 
-        <!-- FOREX -->
-        <div id="example-forex" class="example-content">
-          <div class="example-meta">
-            <span class="method get">GET</span>
-            <code>/api/v1/finance/forex/rates</code>
-          </div>
-          <pre class="code-block lang-js active"><code><span class="c-kw">const</span> res = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/finance/forex/rates'</span>);
+          <!-- FOREX -->
+          <div id="example-forex" class="example-content">
+            <div class="example-meta">
+              <span class="method get">GET</span>
+              <code>/api/v1/finance/forex/rates</code>
+            </div>
+            <pre class="code-block lang-js active"><code><span class="c-kw">const</span> res = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/finance/forex/rates'</span>);
 <span class="c-kw">const</span> { data } = <span class="c-kw">await</span> res.json();
 
 <span class="c-kw">const</span> usd = data.payload[<span class="c-num">0</span>].rates.find(r => r.currency.iso3 === <span class="c-str">'USD'</span>);
 console.log(<span class="c-str">`1 USD = NPR ${usd.sell}`</span>);</code></pre>
-          <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
+            <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
 
 data = requests.get(<span class="c-str">'/api/v1/finance/forex/rates'</span>).json()[<span class="c-str">'data'</span>]
 rates = data[<span class="c-str">'payload'</span>][<span class="c-num">0</span>][<span class="c-str">'rates'</span>]
 usd = next(r <span class="c-kw">for</span> r <span class="c-kw">in</span> rates <span class="c-kw">if</span> r[<span class="c-str">'currency'</span>][<span class="c-str">'iso3'</span>] == <span class="c-str">'USD'</span>)
 print(<span class="c-str">f"1 USD = NPR {usd['sell']}"</span>)</code></pre>
-          <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> /api/v1/finance/forex/rates
+            <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> /api/v1/finance/forex/rates
 
 {
   <span class="c-key">"source"</span>: <span class="c-str">"NRB Live API"</span>,
@@ -1277,19 +1277,19 @@ print(<span class="c-str">f"1 USD = NPR {usd['sell']}"</span>)</code></pre>
     }]
   }
 }</code></pre>
-          <div class="live-runner" data-url="/api/v1/finance/forex/rates">
-            <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
-            <pre class="live-response" hidden></pre>
+            <div class="live-runner" data-url="/api/v1/finance/forex/rates">
+              <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
+              <pre class="live-response" hidden></pre>
+            </div>
           </div>
-        </div>
 
-        <!-- NEWS -->
-        <div id="example-news" class="example-content">
-          <div class="example-meta">
-            <span class="method get">GET</span>
-            <code>/api/v1/news/headlines</code>
-          </div>
-          <pre class="code-block lang-js active"><code><span class="c-kw">const</span> res = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/news/headlines'</span>);
+          <!-- NEWS -->
+          <div id="example-news" class="example-content">
+            <div class="example-meta">
+              <span class="method get">GET</span>
+              <code>/api/v1/news/headlines</code>
+            </div>
+            <pre class="code-block lang-js active"><code><span class="c-kw">const</span> res = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/news/headlines'</span>);
 <span class="c-kw">const</span> { data } = <span class="c-kw">await</span> res.json();
 
 data.headlines.forEach(article => {
@@ -1299,7 +1299,7 @@ data.headlines.forEach(article => {
 <span class="c-comment">// Or pick a specific outlet</span>
 <span class="c-kw">const</span> ok = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/news/source/onlinekhabar'</span>);
 <span class="c-kw">const</span> ok_data = <span class="c-kw">await</span> ok.json();</code></pre>
-          <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
+            <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
 
 r = requests.get(<span class="c-str">'/api/v1/news/headlines'</span>).json()
 <span class="c-kw">for</span> article <span class="c-kw">in</span> r[<span class="c-str">'data'</span>][<span class="c-str">'headlines'</span>]:
@@ -1307,37 +1307,37 @@ r = requests.get(<span class="c-str">'/api/v1/news/headlines'</span>).json()
 
 <span class="c-comment"># Specific outlet: onlinekhabar, setopati, ratopati, ekantipur</span>
 r2 = requests.get(<span class="c-str">'/api/v1/news/source/setopati'</span>).json()</code></pre>
-          <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> /api/v1/news/headlines
+            <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> /api/v1/news/headlines
 
 <span class="c-comment"># Specific Nepali outlet</span>
 <span class="c-cmd">curl</span> /api/v1/news/source/onlinekhabar
 <span class="c-cmd">curl</span> /api/v1/news/source/setopati
 <span class="c-cmd">curl</span> /api/v1/news/source/ratopati
 <span class="c-cmd">curl</span> /api/v1/news/source/ekantipur</code></pre>
-          <div class="live-runner" data-url="/api/v1/news/headlines">
-            <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
-            <pre class="live-response" hidden></pre>
+            <div class="live-runner" data-url="/api/v1/news/headlines">
+              <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
+              <pre class="live-response" hidden></pre>
+            </div>
           </div>
-        </div>
 
-        <!-- JOBS -->
-        <div id="example-jobs" class="example-content">
-          <div class="example-meta">
-            <span class="method get">GET</span>
-            <code>/api/v1/jobs/search</code>
-          </div>
-          <pre class="code-block lang-js active"><code><span class="c-kw">const</span> params = <span class="c-kw">new</span> URLSearchParams({ category: <span class="c-str">'IT'</span>, location: <span class="c-str">'Kathmandu'</span> });
+          <!-- JOBS -->
+          <div id="example-jobs" class="example-content">
+            <div class="example-meta">
+              <span class="method get">GET</span>
+              <code>/api/v1/jobs/search</code>
+            </div>
+            <pre class="code-block lang-js active"><code><span class="c-kw">const</span> params = <span class="c-kw">new</span> URLSearchParams({ category: <span class="c-str">'IT'</span>, location: <span class="c-str">'Kathmandu'</span> });
 <span class="c-kw">const</span> res = <span class="c-kw">await</span> fetch(<span class="c-str">`/api/v1/jobs/search?${params}`</span>);
 <span class="c-kw">const</span> { data } = <span class="c-kw">await</span> res.json();
 
 data.jobs.forEach(j => console.log(j.title, <span class="c-str">'—'</span>, j.company));</code></pre>
-          <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
+            <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
 
 r = requests.get(<span class="c-str">'/api/v1/jobs/search'</span>,
                  params={<span class="c-str">'category'</span>: <span class="c-str">'IT'</span>, <span class="c-str">'location'</span>: <span class="c-str">'Kathmandu'</span>})
 <span class="c-kw">for</span> job <span class="c-kw">in</span> r.json()[<span class="c-str">'data'</span>][<span class="c-str">'jobs'</span>]:
     print(job[<span class="c-str">'title'</span>], <span class="c-str">'—'</span>, job[<span class="c-str">'company'</span>])</code></pre>
-          <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> <span class="c-str">"/api/v1/jobs/search?category=IT&location=Kathmandu"</span>
+            <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> <span class="c-str">"/api/v1/jobs/search?category=IT&location=Kathmandu"</span>
 
 {
   <span class="c-key">"data"</span>: {
@@ -1347,19 +1347,19 @@ r = requests.get(<span class="c-str">'/api/v1/jobs/search'</span>,
     ]
   }
 }</code></pre>
-          <div class="live-runner" data-url="/api/v1/jobs/search?category=IT&amp;location=Kathmandu">
-            <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
-            <pre class="live-response" hidden></pre>
+            <div class="live-runner" data-url="/api/v1/jobs/search?category=IT&amp;location=Kathmandu">
+              <button class="run-btn" onclick="runLive(this)">▶ Run Live</button>
+              <pre class="live-response" hidden></pre>
+            </div>
           </div>
-        </div>
 
-        <!-- PERMIT -->
-        <div id="example-permit" class="example-content">
-          <div class="example-meta">
-            <span class="method post">POST</span>
-            <code>/api/v1/tourism/permits/apply</code>
-          </div>
-          <pre class="code-block lang-js active"><code><span class="c-kw">const</span> res = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/tourism/permits/apply'</span>, {
+          <!-- PERMIT -->
+          <div id="example-permit" class="example-content">
+            <div class="example-meta">
+              <span class="method post">POST</span>
+              <code>/api/v1/tourism/permits/apply</code>
+            </div>
+            <pre class="code-block lang-js active"><code><span class="c-kw">const</span> res = <span class="c-kw">await</span> fetch(<span class="c-str">'/api/v1/tourism/permits/apply'</span>, {
   method: <span class="c-str">'POST'</span>,
   headers: { <span class="c-str">'Content-Type'</span>: <span class="c-str">'application/json'</span> },
   body: JSON.stringify({
@@ -1371,7 +1371,7 @@ r = requests.get(<span class="c-str">'/api/v1/jobs/search'</span>,
 <span class="c-kw">const</span> { data } = <span class="c-kw">await</span> res.json();
 console.log(data.permit_id);  <span class="c-comment">// "PRMT-9FFE4A8F"</span>
 console.log(data.fee_npr);    <span class="c-comment">// 6000</span></code></pre>
-          <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
+            <pre class="code-block lang-python"><code><span class="c-kw">import</span> requests
 
 r = requests.post(<span class="c-str">'/api/v1/tourism/permits/apply'</span>, json={
     <span class="c-str">'trek_id'</span>: <span class="c-str">'EBC'</span>,
@@ -1381,7 +1381,7 @@ r = requests.post(<span class="c-str">'/api/v1/tourism/permits/apply'</span>, js
 data = r.json()[<span class="c-str">'data'</span>]
 print(data[<span class="c-str">'permit_id'</span>])  <span class="c-comment"># PRMT-9FFE4A8F</span>
 print(data[<span class="c-str">'fee_npr'</span>])    <span class="c-comment"># 6000</span></code></pre>
-          <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> /api/v1/tourism/permits/apply \
+            <pre class="code-block lang-curl"><code><span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> /api/v1/tourism/permits/apply \
   <span class="c-flag">-H</span> <span class="c-str">"Content-Type: application/json"</span> \
   <span class="c-flag">-d</span> <span class="c-str">'{"trek_id":"EBC","passport_number":"P123456","nationality":"Foreign"}'</span>
 
@@ -1393,8 +1393,9 @@ print(data[<span class="c-str">'fee_npr'</span>])    <span class="c-comment"># 6
     <span class="c-key">"status"</span>: <span class="c-str">"PENDING_PAYMENT"</span>
   }
 }</code></pre>
-        </div>
+          </div>
 
+        </div>
       </div>
     </div>
   </div>
