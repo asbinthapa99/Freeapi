@@ -16,8 +16,19 @@ const bankBranchesFallback = [
   { bank: 'Nabil Bank', district: 'Kathmandu', branch: 'Putalisadak', phone: '01-4422334' },
   { bank: 'Global IME Bank', district: 'Pokhara', branch: 'Lakeside', phone: '061-451122' },
   { bank: 'NIC Asia', district: 'Chitwan', branch: 'Bharatpur', phone: '056-590221' },
-  { bank: 'Kumari Bank', district: 'Biratnagar', branch: 'Main Road', phone: '021-536200' }
+  { bank: 'Kumari Bank', district: 'Biratnagar', branch: 'Main Road', phone: '021-536200' },
+  { bank: 'Agricultural Development Bank', district: 'Dhading', branch: 'Dhadingbesi', phone: '010-520124' },
+  { bank: 'Nabil Bank', district: 'Dhading', branch: 'Dhadingbesi', phone: '010-521457' },
+  { bank: 'Global IME Bank', district: 'Dhading', branch: 'Galchi', phone: '010-403126' }
 ];
+
+const normalizeQuery = (value) => String(value || '').toLowerCase().trim().replace(/\s+/g, ' ');
+const textMatches = (value, query) => {
+  const normalizedQuery = normalizeQuery(query);
+  if (!normalizedQuery) return true;
+  const normalizedValue = normalizeQuery(value);
+  return normalizedQuery.split(' ').every((token) => normalizedValue.includes(token));
+};
 
 const categorizeExpense = (description) => {
   const normalized = description.toLowerCase();
@@ -196,17 +207,19 @@ exports.initiatePayment = async (req, res, next) => {
 
 exports.getBankBranches = async (req, res, next) => {
   try {
-    const { bank, district } = req.query;
+    const bank = normalizeQuery(req.query.bank);
+    const district = normalizeQuery(req.query.district);
     const liveBranches = await liveApi.fetchBankBranches({ bank, district, limit: 75 });
-    const bankBranches = liveBranches
+    const hasLiveResults = Array.isArray(liveBranches) && liveBranches.length > 0;
+    const bankBranches = hasLiveResults
       ? liveBranches
       : await getDataset('finance_bank_branches', bankBranchesFallback);
     let branches = bankBranches;
 
-    if (bank) branches = branches.filter((item) => item.bank.toLowerCase().includes(bank.toLowerCase()));
-    if (district) branches = branches.filter((item) => item.district && item.district.toLowerCase().includes(district.toLowerCase()));
+    if (!hasLiveResults && bank) branches = branches.filter((item) => textMatches(item.bank, bank));
+    if (!hasLiveResults && district) branches = branches.filter((item) => textMatches(item.district, district));
 
-    if (liveApi.isStrictLiveMode() && !liveBranches) {
+    if (liveApi.isStrictLiveMode() && !hasLiveResults) {
       return res.status(503).json({
         error: {
           code: 'UPSTREAM_BANK_BRANCHES_UNAVAILABLE',
@@ -216,7 +229,17 @@ exports.getBankBranches = async (req, res, next) => {
       });
     }
 
-    res.json({ status: 'success', source: liveBranches ? 'OpenStreetMap' : 'catalog', data: { count: branches.length, branches } });
+    res.json({
+      status: 'success',
+      source: hasLiveResults ? 'OpenStreetMap' : 'catalog',
+      data: {
+        count: branches.length,
+        branches,
+        ...(branches.length === 0 ? {
+          message: 'No bank branches matched the filters. Remove the bank filter or try Nabil Bank, Global IME Bank, NIC Asia, Kumari Bank, or Agricultural Development Bank.'
+        } : {})
+      }
+    });
   } catch (error) { next(error); }
 };
 

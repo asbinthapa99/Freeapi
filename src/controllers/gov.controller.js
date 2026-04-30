@@ -5,6 +5,14 @@ const { getDataset } = require('../services/catalog.service');
 const verificationService = require('../services/verification.service');
 const liveApi = require('../services/liveApi.service');
 
+const normalizeQuery = (value) => String(value || '').toLowerCase().trim().replace(/\s+/g, ' ');
+const textMatches = (value, query) => {
+  const normalizedQuery = normalizeQuery(query);
+  if (!normalizedQuery) return true;
+  const normalizedValue = normalizeQuery(value);
+  return normalizedQuery.split(' ').every((token) => normalizedValue.includes(token));
+};
+
 exports.trackApplication = async (req, res, next) => {
   try {
     const { app_id } = req.params;
@@ -21,9 +29,12 @@ exports.trackApplication = async (req, res, next) => {
 
 exports.getWardInfo = async (req, res, next) => {
   try {
-    const { ward, municipality } = req.query;
+    const ward = normalizeQuery(req.query.ward);
+    const municipality = normalizeQuery(req.query.municipality);
     const liveOffices = await liveApi.fetchGovernmentOffices({ ward, municipality, limit: 75 });
-    if (!liveOffices && liveApi.isStrictLiveMode()) {
+    const hasLiveResults = Array.isArray(liveOffices) && liveOffices.length > 0;
+
+    if (!hasLiveResults && liveApi.isStrictLiveMode()) {
       return res.status(503).json({
         error: {
           code: 'UPSTREAM_GOV_OFFICES_UNAVAILABLE',
@@ -33,12 +44,24 @@ exports.getWardInfo = async (req, res, next) => {
       });
     }
 
-    let offices = liveOffices || await getDataset('gov_ward_offices', govDisasterData.wardOffices);
+    let offices = hasLiveResults
+      ? liveOffices
+      : await getDataset('gov_ward_offices', govDisasterData.wardOffices);
     
-    if (!liveOffices && ward) offices = offices.filter(o => o.ward === parseInt(ward, 10));
-    if (!liveOffices && municipality) offices = offices.filter(o => o.municipality.toLowerCase().includes(municipality.toLowerCase()));
+    if (!hasLiveResults && ward) offices = offices.filter(o => String(o.ward) === ward);
+    if (!hasLiveResults && municipality) offices = offices.filter(o => textMatches(`${o.municipality || ''} ${o.district || ''}`, municipality));
     
-    res.json({ status: 'success', source: liveOffices ? 'OpenStreetMap' : 'catalog', data: { count: offices.length, offices } });
+    res.json({
+      status: 'success',
+      source: hasLiveResults ? 'OpenStreetMap' : 'catalog',
+      data: {
+        count: offices.length,
+        offices,
+        ...(offices.length === 0 ? {
+          message: 'No offices matched the filters. Try a known municipality such as Kathmandu Metropolitan City, Bhaktapur Municipality, Pokhara Metropolitan City, or Thakre Rural Municipality.'
+        } : {})
+      }
+    });
   } catch (error) { next(error); }
 };
 

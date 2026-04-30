@@ -213,6 +213,11 @@ describe('integration coverage', () => {
       reference: 'ORDER-1'
     })).statusCode).toBe(201);
     expect((await request(app).get('/api/v1/finance/banks/branches')).statusCode).toBe(200);
+    const dhadingBranches = await request(app).get('/api/v1/finance/banks/branches').query({
+      district: 'dhading '
+    });
+    expect(dhadingBranches.statusCode).toBe(200);
+    expect(dhadingBranches.body.data.count).toBeGreaterThan(0);
     expect((await request(app).get('/api/v1/finance/inflation')).statusCode).toBe(200);
     expect((await request(app).post('/api/v1/finance/budget/categorize').send({
       entries: [{ description: 'grocery mart', amount: 1000 }]
@@ -227,6 +232,13 @@ describe('integration coverage', () => {
     expect((await request(app).get('/api/v1/gov/holidays/2025')).statusCode).toBe(200);
     expect((await request(app).get('/api/v1/gov/holidays').query({ month: '01' })).statusCode).toBe(200);
     expect((await request(app).get('/api/v1/gov/offices/ward')).statusCode).toBe(200);
+    const thakreWard = await request(app).get('/api/v1/gov/offices/ward').query({
+      ward: '6',
+      municipality: 'thakre municipality '
+    });
+    expect(thakreWard.statusCode).toBe(200);
+    expect(thakreWard.body.data.count).toBe(1);
+    expect(thakreWard.body.data.offices[0].municipality).toBe('Thakre Rural Municipality');
     expect((await request(app).get('/api/v1/gov/tax/vehicle-rates')).statusCode).toBe(200);
 
     expect((await request(app).post('/api/v1/health/triage/analyze').send({

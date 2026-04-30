@@ -83,7 +83,10 @@ const seedMongoDatabase = async () => {
       { bank: 'Nabil Bank', district: 'Kathmandu', branch: 'Putalisadak', phone: '01-4422334' },
       { bank: 'Global IME Bank', district: 'Pokhara', branch: 'Lakeside', phone: '061-451122' },
       { bank: 'NIC Asia', district: 'Chitwan', branch: 'Bharatpur', phone: '056-590221' },
-      { bank: 'Kumari Bank', district: 'Biratnagar', branch: 'Main Road', phone: '021-536200' }
+      { bank: 'Kumari Bank', district: 'Biratnagar', branch: 'Main Road', phone: '021-536200' },
+      { bank: 'Agricultural Development Bank', district: 'Dhading', branch: 'Dhadingbesi', phone: '010-520124' },
+      { bank: 'Nabil Bank', district: 'Dhading', branch: 'Dhadingbesi', phone: '010-521457' },
+      { bank: 'Global IME Bank', district: 'Dhading', branch: 'Galchi', phone: '010-403126' }
     ] },
     { dataset_key: 'gov_applications', payload: govDisasterData.govApplications },
     { dataset_key: 'gov_ward_offices', payload: govDisasterData.wardOffices },

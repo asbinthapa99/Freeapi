@@ -33,6 +33,7 @@ module.exports = {
     { ward: 4, municipality: 'Kathmandu Metropolitan City', address: 'Kamaladi', phone: '01-4220056', office_hours: '10:00-17:00' },
     { ward: 10, municipality: 'Lalitpur Metropolitan City', address: 'Kupondole', phone: '01-5540078', office_hours: '10:00-17:00' },
     { ward: 6, municipality: 'Bhaktapur Municipality', address: 'Taumadhi', phone: '01-6612345', office_hours: '10:00-17:00' },
-    { ward: 1, municipality: 'Pokhara Metropolitan City', address: 'Lakeside', phone: '061-520034', office_hours: '10:00-17:00' }
+    { ward: 1, municipality: 'Pokhara Metropolitan City', address: 'Lakeside', phone: '061-520034', office_hours: '10:00-17:00' },
+    { ward: 6, municipality: 'Thakre Rural Municipality', district: 'Dhading', address: 'Mahadevbesi, Dhading', phone: '010-414064', office_hours: '10:00-17:00' }
   ]
 };
